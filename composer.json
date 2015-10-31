@@ -1,0 +1,15 @@
+{
+  "name": "vertexvaar/falsftp",
+  "type": "typo3-cms-extension",
+  "description": "FAL SFTP driver rewrite for the great TYPO3 v7",
+  "license": "GPL-2.0+",
+  "autoload": {
+    "psr-4": {
+      "VerteXVaaR\\FalSftp\\": "Classes/"
+    }
+  },
+  "require": {
+    "php": ">=5.5.0",
+    "typo3/cms": ">=7.0.0"
+  }
+}
