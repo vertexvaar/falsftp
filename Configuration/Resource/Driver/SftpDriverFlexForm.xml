@@ -82,7 +82,7 @@
                             <config>
                                 <type>input</type>
                                 <size>33</size>
-                                <eval>trim,required</eval>
+                                <eval>password,required</eval>
                             </config>
                         </TCEforms>
                     </password>
@@ -123,7 +123,7 @@
                             <config>
                                 <type>input</type>
                                 <size>33</size>
-                                <eval>trim,required</eval>
+                                <eval>password</eval>
                             </config>
                         </TCEforms>
                     </privateKeyPassword>
