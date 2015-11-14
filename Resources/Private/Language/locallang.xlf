@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2015-11-14T18:20:00Z"
+          product-name="falsftp">
+        <header/>
+        <body>
+            <trans-unit id="flexform.general">
+                <source>General Settings</source>
+            </trans-unit>
+
+            <trans-unit id="flexform.general.hostname">
+                <source>Hostname</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.username">
+                <source>Username</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.basePath">
+                <source>Base path</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.authenticationMethod">
+                <source>Authentication Method</source>
+            </trans-unit>
+
+            <trans-unit id="flexform.password">
+                <source>Password Authentication</source>
+            </trans-unit>
+            <trans-unit id="flexform.password.password">
+                <source>Password</source>
+            </trans-unit>
+
+            <trans-unit id="flexform.pubkey">
+                <source>Public Key Authentication</source>
+            </trans-unit>
+            <trans-unit id="flexform.pubkey.publicKey">
+                <source>Public Key</source>
+            </trans-unit>
+            <trans-unit id="flexform.pubkey.privateKey">
+                <source>Private Key</source>
+            </trans-unit>
+            <trans-unit id="flexform.pubkey.privateKeyPassword">
+                <source>Private Key Password</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
