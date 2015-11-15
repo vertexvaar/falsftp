@@ -23,6 +23,12 @@ interface AdapterInterface
 
     /**
      * @param string $identifier
+     * @return mixed
+     */
+    public function fileExists($identifier);
+
+    /**
+     * @param string $identifier
      * @param bool $recursive
      * @return string
      */
@@ -30,7 +36,27 @@ interface AdapterInterface
 
     /**
      * @param string $identifier
-     * @return mixed
+     * @return array
      */
     public function getPermissions($identifier);
+
+    /**
+     * @param string $identifier
+     * @return array
+     */
+    public function getDetails($identifier);
+
+    /**
+     * @param string $identifier
+     * @param string $hashAlgorithm
+     * @return string
+     */
+    public function hash($identifier, $hashAlgorithm);
+
+    /**
+     * @param string $identifier
+     * @param string $target
+     * @return string
+     */
+    public function downloadFile($identifier, $target);
 }

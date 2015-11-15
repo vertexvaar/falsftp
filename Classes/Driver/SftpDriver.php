@@ -1,8 +1,9 @@
 <?php
 namespace VerteXVaaR\FalSftp\Driver;
 
-use TYPO3\CMS\Core\Resource\Driver\AbstractDriver;
+use TYPO3\CMS\Core\Resource\Driver\AbstractHierarchicalFilesystemDriver;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use VerteXVaaR\FalSftp\Adapter\AdapterInterface;
 use VerteXVaaR\FalSftp\Adapter\PhpSshAdapter;
@@ -10,7 +11,7 @@ use VerteXVaaR\FalSftp\Adapter\PhpSshAdapter;
 /**
  * Class SftpDriver
  */
-class SftpDriver extends AbstractDriver
+class SftpDriver extends AbstractHierarchicalFilesystemDriver
 {
     const ADAPTER_PHPSSH = 1;
     const ADAPTER_PHPSECLIB = 2;
@@ -32,6 +33,16 @@ class SftpDriver extends AbstractDriver
     protected $adapter = null;
 
     /**
+     * @var string
+     */
+    protected $rootPath = '';
+
+    /**
+     * @var int
+     */
+    protected $rootPathLength = 0;
+
+    /**
      * Processes the configuration for this driver.
      * @return void
      */
@@ -39,6 +50,8 @@ class SftpDriver extends AbstractDriver
     {
         $this->configuration['fileMode'] = octdec($this->configuration['fileMode']);
         $this->configuration['folderMode'] = octdec($this->configuration['folderMode']);
+        $this->rootPath = '/' . trim($this->configuration[self::CONFIG_ROOT_LEVEL], '/') . '/';
+        $this->rootPathLength = strlen($this->rootPath);
         if (!empty($this->configuration[self::CONFIG_PUBLIC_URL])) {
             $this->capabilities =
                 ResourceStorageInterface::CAPABILITY_BROWSABLE
@@ -85,7 +98,7 @@ class SftpDriver extends AbstractDriver
      */
     public function getRootLevelFolder()
     {
-        return $this->configuration[self::CONFIG_ROOT_LEVEL];
+        return '/';
     }
 
     /**
@@ -94,17 +107,6 @@ class SftpDriver extends AbstractDriver
      * @return string
      */
     public function getDefaultFolder()
-    {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-    }
-
-    /**
-     * Returns the identifier of the folder the file resides in
-     *
-     * @param string $fileIdentifier
-     * @return string
-     */
-    public function getParentFolderIdentifierOfIdentifier($fileIdentifier)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
     }
@@ -132,7 +134,9 @@ class SftpDriver extends AbstractDriver
      */
     public function createFolder($newFolderName, $parentFolderIdentifier = '', $recursive = false)
     {
-        return $this->adapter->createFolder($parentFolderIdentifier . $newFolderName, $recursive);
+        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([$newFolderName, $parentFolderIdentifier], __CLASS__ . '@' . __LINE__, 20);
+        die;
+        return $this->adapter->createFolder($this->configuration[self::CONFIG_ROOT_LEVEL] . $parentFolderIdentifier . $newFolderName, $recursive);
     }
 
     /**
@@ -167,7 +171,8 @@ class SftpDriver extends AbstractDriver
      */
     public function fileExists($fileIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        return $this->adapter->fileExists($fileIdentifier);
     }
 
     /**
@@ -178,6 +183,7 @@ class SftpDriver extends AbstractDriver
      */
     public function folderExists($folderIdentifier)
     {
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         return $this->adapter->folderExists($this->getRootLevelFolder() . $folderIdentifier);
     }
 
@@ -283,7 +289,8 @@ class SftpDriver extends AbstractDriver
      */
     public function hash($fileIdentifier, $hashAlgorithm)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        return $this->adapter->hash($fileIdentifier, $hashAlgorithm);
     }
 
     /**
@@ -362,7 +369,8 @@ class SftpDriver extends AbstractDriver
      */
     public function fileExistsInFolder($fileName, $folderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $identifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier . $fileName);
+        return $this->adapter->fileExists($identifier);
     }
 
     /**
@@ -374,6 +382,8 @@ class SftpDriver extends AbstractDriver
      */
     public function folderExistsInFolder($folderName, $folderIdentifier)
     {
+        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([$folderName, $folderIdentifier], __CLASS__ . '@' . __LINE__, 20);
+        die;
         return $this->adapter->folderExists($folderIdentifier . $folderName);
     }
 
@@ -390,7 +400,14 @@ class SftpDriver extends AbstractDriver
      */
     public function getFileForLocalProcessing($fileIdentifier, $writable = true)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        return $this->adapter->downloadFile(
+            $fileIdentifier,
+            \TYPO3\CMS\Core\Utility\GeneralUtility::tempnam(
+                'fal-tempfile-',
+                '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
+            )
+        );
     }
 
     /**
@@ -402,6 +419,7 @@ class SftpDriver extends AbstractDriver
      */
     public function getPermissions($identifier)
     {
+        $identifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $identifier);
         return $this->adapter->getPermissions($identifier);
     }
 
@@ -433,7 +451,17 @@ class SftpDriver extends AbstractDriver
      */
     public function isWithin($folderIdentifier, $identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFileIdentifier($folderIdentifier);
+        $entryIdentifier = $this->canonicalizeAndCheckFileIdentifier($identifier);
+        if ($folderIdentifier === $entryIdentifier) {
+            return true;
+        }
+        // File identifier canonicalization will not modify a single slash so
+        // we must not append another slash in that case.
+        if ($folderIdentifier !== '/') {
+            $folderIdentifier .= '/';
+        }
+        return GeneralUtility::isFirstPartOfStr($entryIdentifier, $folderIdentifier);
     }
 
     /**
@@ -446,7 +474,49 @@ class SftpDriver extends AbstractDriver
      */
     public function getFileInfoByIdentifier($fileIdentifier, array $propertiesToExtract = array())
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $originalIdentifier = $fileIdentifier;
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        $details = $this->getDetails($fileIdentifier, $propertiesToExtract, $originalIdentifier);
+        return $details;
+    }
+
+    /**
+     * @param string $identifier
+     * @param array $propertiesToExtract
+     * @param string $originalIdentifier
+     * @return array
+     */
+    protected function getDetails($identifier, array $propertiesToExtract, $originalIdentifier)
+    {
+        if (empty($propertiesToExtract)) {
+            $propertiesToExtract = array(
+                'size', 'atime', 'atime', 'mtime', 'ctime', 'mimetype', 'name',
+                'identifier', 'identifier_hash', 'storage', 'folder_hash',
+            );
+        }
+        $information = $this->adapter->getDetails($identifier);
+        $information = $this->enrichInformation($information, $originalIdentifier);
+        foreach (array_keys($information) as $property) {
+            if (!in_array($property, $propertiesToExtract)) {
+                unset($information[$property]);
+            }
+        }
+        return $information;
+    }
+
+    /**
+     * @param array $information
+     * @param string $originalIdentifier
+     * @return array
+     */
+    protected function enrichInformation(array $information, $originalIdentifier)
+    {
+        $information['name'] = PathUtility::basename($originalIdentifier);
+        $information['identifier'] = $originalIdentifier;
+        $information['storage'] = $this->storageUid;
+        $information['identifier_hash'] = $this->hashIdentifier($originalIdentifier);
+        $information['folder_hash'] = $this->hashIdentifier($this->getParentFolderIdentifierOfIdentifier($originalIdentifier));
+        return $information;
     }
 
     /**
@@ -460,7 +530,7 @@ class SftpDriver extends AbstractDriver
         return array(
             'identifier' => $folderIdentifier,
             'name' => PathUtility::basename($folderIdentifier),
-            'storage' => $this->storageUid
+            'storage' => $this->storageUid,
         );
     }
 
@@ -494,7 +564,10 @@ class SftpDriver extends AbstractDriver
      */
     public function getFilesInFolder($folderIdentifier, $start = 0, $numberOfItems = 0, $recursive = false, array $filenameFilterCallbacks = array(), $sort = '', $sortRev = false)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
+        $items = $this->adapter->scanDirectory($folderIdentifier, true, false, $recursive);
+        $items = $this->processResults($items, $sort, $sortRev, $start, $numberOfItems, $filenameFilterCallbacks);
+        return $items;
     }
 
     /**
@@ -534,6 +607,7 @@ class SftpDriver extends AbstractDriver
         $sort = '',
         $sortRev = false
     ) {
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, false, true, $recursive);
         $items = $this->processResults($items, $sort, $sortRev, $start, $numberOfItems, $folderNameFilterCallbacks);
         return $items;
@@ -557,7 +631,22 @@ class SftpDriver extends AbstractDriver
         foreach (array_keys($items) as $identifier) {
             $items[$identifier] = $identifier;
         }
+        $items = $this->dropRootPaths($items);
         return $items;
+    }
+
+    /**
+     * @param array $items
+     * @return array
+     */
+    protected function dropRootPaths(array $items)
+    {
+        $newItems = [];
+        foreach ($items as $identifier) {
+            $identifier = substr($identifier, $this->rootPathLength);
+            $newItems[$identifier] = $identifier;
+        }
+        return $newItems;
     }
 
     /**
@@ -570,6 +659,11 @@ class SftpDriver extends AbstractDriver
     protected function sortItems(array $items, $sort, $sortRev)
     {
         switch ($sort) {
+            case 'file':
+                $callback = function ($left, $right) {
+                    return strnatcasecmp($left['name'], $right['name']);
+                };
+                break;
             case '':
                 $callback = function ($left, $right) {
                     return strnatcasecmp($left['identifier'], $right['identifier']);
@@ -642,7 +736,10 @@ class SftpDriver extends AbstractDriver
      */
     public function countFilesInFolder($folderIdentifier, $recursive = false, array $filenameFilterCallbacks = array())
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
+        $items = $this->adapter->scanDirectory($folderIdentifier, true, false, $recursive);
+        $items = $this->filterItems($items, $filenameFilterCallbacks);
+        return count($items);
     }
 
     /**
@@ -655,40 +752,9 @@ class SftpDriver extends AbstractDriver
      */
     public function countFoldersInFolder($folderIdentifier, $recursive = false, array $folderNameFilterCallbacks = array())
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-    }
-
-    /**
-     * Makes sure the path given as parameter is valid
-     *
-     * @param string $filePath The file path (most times filePath)
-     * @return string
-     */
-    protected function canonicalizeAndCheckFilePath($filePath)
-    {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-    }
-
-    /**
-     * Makes sure the identifier given as parameter is valid
-     *
-     * @param string $fileIdentifier The file Identifier
-     * @return string
-     * @throws \TYPO3\CMS\Core\Resource\Exception\InvalidPathException
-     */
-    protected function canonicalizeAndCheckFileIdentifier($fileIdentifier)
-    {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-    }
-
-    /**
-     * Makes sure the identifier given as parameter is valid
-     *
-     * @param string $folderIdentifier The folder identifier
-     * @return string
-     */
-    protected function canonicalizeAndCheckFolderIdentifier($folderIdentifier)
-    {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
+        $items = $this->adapter->scanDirectory($folderIdentifier, false, true, $recursive);
+        $items = $this->filterItems($items, $folderNameFilterCallbacks);
+        return count($items);
     }
 }

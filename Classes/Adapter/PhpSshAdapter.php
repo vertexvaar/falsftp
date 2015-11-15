@@ -1,6 +1,7 @@
 <?php
 namespace VerteXVaaR\FalSftp\Adapter;
 
+use TYPO3\CMS\Core\Type\File\FileInfo;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
@@ -108,12 +109,22 @@ class PhpSshAdapter implements AdapterInterface
      * @param string $identifier
      * @return mixed
      */
+    public function fileExists($identifier)
+    {
+        $wrappedIdentifier = $this->sftpWrapper . $identifier;
+        return file_exists($wrappedIdentifier) && is_file($wrappedIdentifier);
+    }
+
+    /**
+     * @param string $identifier
+     * @return mixed
+     */
     public function getPermissions($identifier)
     {
         $path = $this->sftpWrapper . $identifier;
         return array(
             'r' => (bool)is_readable($path),
-            'w' => (bool)is_writable($path)
+            'w' => (bool)is_writable($path),
         );
     }
 
@@ -140,5 +151,54 @@ class PhpSshAdapter implements AdapterInterface
             'name' => PathUtility::basename($identifier),
             'type' => $type,
         ];
+    }
+
+    /**
+     * @param string $identifier
+     * @return array
+     */
+    public function getDetails($identifier)
+    {
+        $fileInfo = new FileInfo($identifier);
+        $details = [];
+        $details['size'] = $fileInfo->getSize();
+        $details['atime'] = $fileInfo->getATime();
+        $details['mtime'] = $fileInfo->getMTime();
+        $details['ctime'] = $fileInfo->getCTime();
+        $details['mimetype'] = (string)$fileInfo->getMimeType();
+        return $details;
+    }
+
+    /**
+     * @param string $identifier
+     * @param string $hashAlgorithm
+     * @return string
+     */
+    public function hash($identifier, $hashAlgorithm)
+    {
+        switch ($hashAlgorithm) {
+            case 'sha1':
+                return sha1_file($this->sftpWrapper . $identifier);
+            case 'md5':
+                return md5_file($this->sftpWrapper . $identifier);
+            default:
+        }
+        return '';
+    }
+
+    /**
+     * @param string $identifier
+     * @param string $target
+     * @return string
+     */
+    public function downloadFile($identifier, $target)
+    {
+        if (ssh2_scp_recv($this->ssh, $identifier, $target)) {
+            return $target;
+        }
+        throw new \RuntimeException(
+            'Copying file "' . $identifier . '" to temporary path "' . $target . '" failed.',
+            1447607200
+        );
     }
 }
