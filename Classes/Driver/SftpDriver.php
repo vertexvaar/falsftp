@@ -221,7 +221,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $this->rootPath . $targetFileIdentifier
         );
         if ($this->adapter->uploadFile($localFilePath, $identifier) && $removeOriginal) {
-            unlink($removeOriginal);
+            unlink($localFilePath);
         }
         return $targetFileIdentifier;
     }

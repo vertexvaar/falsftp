@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * For everyone: The driver registration ist not handled within the ext_tables.php
+ * file because the driver would not be registered when the storage is not public.
+ *
+ * Technical information:
+ * The called URL looks like index.php?eID=dumpFile&t=p&p=2&token=xxx
+ * As you can see, it is an eID call. ext_tables.php are not loaded here.
+ *
+ */
+
 $bootFalSftp = function () {
     $driverRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
         \TYPO3\CMS\Core\Resource\Driver\DriverRegistry::class
