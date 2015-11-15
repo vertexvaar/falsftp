@@ -20,6 +20,15 @@
             <trans-unit id="flexform.general.authenticationMethod">
                 <source>Authentication Method</source>
             </trans-unit>
+            <trans-unit id="flexform.general.adapter">
+                <source>Adapter</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.adapter.phpSshAdapter">
+                <source>PHP SSH2 Adapter</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.adapter.phpseclibAdapter">
+                <source>phpseclib Adapter</source>
+            </trans-unit>
 
             <trans-unit id="flexform.password">
                 <source>Password Authentication</source>

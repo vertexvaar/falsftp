@@ -65,6 +65,23 @@
                             </config>
                         </TCEforms>
                     </authenticationMethod>
+
+                    <adapter>
+                        <TCEforms>
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.adapter</label>
+                            <config>
+                                <type>select</type>
+                                <itemsProcFunc>VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection</itemsProcFunc>
+                                <items type="array">
+                                    <numIndex index="0" type="array">
+                                        <numIndex index="0">Please choose ...</numIndex>
+                                        <numIndex index="1"></numIndex>
+                                    </numIndex>
+                                </items>
+                                <eval>required</eval>
+                            </config>
+                        </TCEforms>
+                    </adapter>
                 </el>
             </ROOT>
         </general>

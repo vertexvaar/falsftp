@@ -8,39 +8,8 @@ use TYPO3\CMS\Core\Resource\Driver\AbstractDriver;
  */
 class SftpDriver extends AbstractDriver
 {
-    /**
-     * Makes sure the path given as parameter is valid
-     *
-     * @param string $filePath The file path (most times filePath)
-     * @return string
-     */
-    protected function canonicalizeAndCheckFilePath($filePath)
-    {
-        // TODO: Implement canonicalizeAndCheckFilePath() method.
-    }
-
-    /**
-     * Makes sure the identifier given as parameter is valid
-     *
-     * @param string $fileIdentifier The file Identifier
-     * @return string
-     * @throws \TYPO3\CMS\Core\Resource\Exception\InvalidPathException
-     */
-    protected function canonicalizeAndCheckFileIdentifier($fileIdentifier)
-    {
-        // TODO: Implement canonicalizeAndCheckFileIdentifier() method.
-    }
-
-    /**
-     * Makes sure the identifier given as parameter is valid
-     *
-     * @param string $folderIdentifier The folder identifier
-     * @return string
-     */
-    protected function canonicalizeAndCheckFolderIdentifier($folderIdentifier)
-    {
-        // TODO: Implement canonicalizeAndCheckFolderIdentifier() method.
-    }
+    const ADAPTER_PHPSSH = 1;
+    const ADAPTER_PHPSECLIB = 2;
 
     /**
      * Processes the configuration for this driver.
@@ -547,5 +516,39 @@ class SftpDriver extends AbstractDriver
     public function countFoldersInFolder($folderIdentifier, $recursive = false, array $folderNameFilterCallbacks = array())
     {
         // TODO: Implement countFoldersInFolder() method.
+    }
+
+    /**
+     * Makes sure the path given as parameter is valid
+     *
+     * @param string $filePath The file path (most times filePath)
+     * @return string
+     */
+    protected function canonicalizeAndCheckFilePath($filePath)
+    {
+        // TODO: Implement canonicalizeAndCheckFilePath() method.
+    }
+
+    /**
+     * Makes sure the identifier given as parameter is valid
+     *
+     * @param string $fileIdentifier The file Identifier
+     * @return string
+     * @throws \TYPO3\CMS\Core\Resource\Exception\InvalidPathException
+     */
+    protected function canonicalizeAndCheckFileIdentifier($fileIdentifier)
+    {
+        // TODO: Implement canonicalizeAndCheckFileIdentifier() method.
+    }
+
+    /**
+     * Makes sure the identifier given as parameter is valid
+     *
+     * @param string $folderIdentifier The folder identifier
+     * @return string
+     */
+    protected function canonicalizeAndCheckFolderIdentifier($folderIdentifier)
+    {
+        // TODO: Implement canonicalizeAndCheckFolderIdentifier() method.
     }
 }
