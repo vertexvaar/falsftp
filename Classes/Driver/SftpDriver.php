@@ -122,7 +122,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getPublicUrl($identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        return $this->configuration[self::CONFIG_PUBLIC_URL] . $identifier;
     }
 
     /**
@@ -136,9 +136,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function createFolder($newFolderName, $parentFolderIdentifier = '', $recursive = false)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([$newFolderName, $parentFolderIdentifier], __CLASS__ . '@' . __LINE__, 20);
-        die;
-        return $this->adapter->createFolder($this->configuration[self::CONFIG_ROOT_LEVEL] . $parentFolderIdentifier . $newFolderName, $recursive);
+        $newFolderName = $this->canonicalizeAndCheckFolderIdentifier($parentFolderIdentifier . $newFolderName);
+        $identifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $newFolderName);
+        $this->adapter->createFolder($identifier, $recursive);
+        return $newFolderName;
     }
 
     /**
@@ -162,7 +163,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function deleteFolder($folderIdentifier, $deleteRecursively = false)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier);
+        return $this->adapter->unlink($folderIdentifier, $deleteRecursively);
     }
 
     /**
@@ -197,7 +199,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function isFolderEmpty($folderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folderIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier);
+        return count($this->adapter->scanDirectory($folderIdentifier)) === 0;
     }
 
     /**
@@ -235,7 +238,18 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function createFile($fileName, $parentFolderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileName = $this->sanitizeFileName($fileName);
+        $temporaryFile =
+            GeneralUtility::tempnam(
+                'fal-tempfile-',
+                '.' . PathUtility::pathinfo($fileName, PATHINFO_EXTENSION)
+            );
+        touch($temporaryFile);
+        $fileName = $parentFolderIdentifier . $fileName;
+        $identifier = $this->canonicalizeAndCheckFilePath($this->rootPath . $fileName);
+        $this->adapter->uploadFile($temporaryFile, $identifier);
+        unlink($temporaryFile);
+        return $fileName;
     }
 
     /**
@@ -355,7 +369,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFileContents($fileIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        return $this->adapter->getFileContents($fileIdentifier);
     }
 
     /**
@@ -367,7 +382,24 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function setFileContents($fileIdentifier, $contents)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $temporaryFile =
+            GeneralUtility::tempnam(
+                'fal-tempfile-',
+                '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
+            );
+        $bytes = file_put_contents($temporaryFile, $contents);
+        do {
+            $temporaryIdentifier = $this->canonicalizeAndCheckFileIdentifier(
+                $this->rootPath . 'fal-tempfile-' . str_replace('/', '_', $fileIdentifier) . mt_rand(1, PHP_INT_MAX)
+            );
+        } while ($this->adapter->fileExists($temporaryIdentifier));
+
+        $this->adapter->uploadFile($temporaryFile, $temporaryIdentifier);
+        unlink($temporaryFile);
+
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        $this->adapter->rename($temporaryIdentifier, $fileIdentifier);
+        return $bytes;
     }
 
     /**
@@ -392,9 +424,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function folderExistsInFolder($folderName, $folderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([$folderName, $folderIdentifier], __CLASS__ . '@' . __LINE__, 20);
-        die;
-        return $this->adapter->folderExists($folderIdentifier . $folderName);
+        $identifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier . $folderName);
+        return $this->adapter->folderExists($identifier);
     }
 
     /**
@@ -413,7 +444,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
         return $this->adapter->downloadFile(
             $fileIdentifier,
-            \TYPO3\CMS\Core\Utility\GeneralUtility::tempnam(
+            GeneralUtility::tempnam(
                 'fal-tempfile-',
                 '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
             )

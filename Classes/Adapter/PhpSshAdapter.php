@@ -86,9 +86,11 @@ class PhpSshAdapter implements AdapterInterface
             $iterator->next();
         }
         if ($recursive) {
-            foreach (array_keys($directoryEntries) as $directoryEntry) {
-                foreach ($this->scanDirectory($directoryEntry, $files, $folders, $recursive) as $identifier => $info) {
-                    $directoryEntries[$identifier] = $info;
+            foreach ($directoryEntries as $directoryEntry) {
+                if ($directoryEntry['type'] === 'dir') {
+                    foreach ($this->scanDirectory($directoryEntry, $files, $folders, $recursive) as $identifier => $info) {
+                        $directoryEntries[$identifier] = $info;
+                    }
                 }
             }
         }
@@ -219,5 +221,46 @@ class PhpSshAdapter implements AdapterInterface
     public function dumpFile($identifier)
     {
         readfile($this->sftpWrapper . $identifier);
+    }
+
+    /**
+     * @param string $identifier
+     * @param bool $recursive
+     * @return bool
+     */
+    public function unlink($identifier, $recursive)
+    {
+        if (is_dir($this->sftpWrapper . $identifier)) {
+            return ssh2_sftp_rmdir($this->sftp, $identifier);
+        } elseif (is_file($this->sftpWrapper . $identifier)) {
+            return ssh2_sftp_unlink($this->sftp, $identifier);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param string $identifier
+     * @return string
+     */
+    public function getFileContents($identifier)
+    {
+        return file_get_contents($this->sftpWrapper . $identifier);
+    }
+
+    /**
+     * @param string $oldIdentifier
+     * @param string $newIdentifier
+     * @return bool
+     */
+    public function rename($oldIdentifier, $newIdentifier)
+    {
+        $this->unlink($newIdentifier, false);
+        if (ssh2_sftp_rename($this->sftp, $oldIdentifier, $newIdentifier)) {
+            return true;
+        } else {
+            $this->unlink($oldIdentifier, false);
+            return false;
+        }
     }
 }

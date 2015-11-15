@@ -72,4 +72,24 @@ interface AdapterInterface
      * @return void
      */
     public function dumpFile($identifier);
+
+    /**
+     * @param string $identifier
+     * @param bool $recursive
+     * @return bool
+     */
+    public function unlink($identifier, $recursive);
+
+    /**
+     * @param string $identifier
+     * @return string
+     */
+    public function getFileContents($identifier);
+
+    /**
+     * @param string $oldIdentifier
+     * @param string $newIdentifier
+     * @return bool
+     */
+    public function rename($oldIdentifier, $newIdentifier);
 }
