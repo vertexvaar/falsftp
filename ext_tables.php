@@ -4,12 +4,14 @@ $bootFalSftp = function () {
     $driverRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
         \TYPO3\CMS\Core\Resource\Driver\DriverRegistry::class
     );
+    $flexBuilder = new \VerteXVaaR\FalSftp\Environment\FlexBuilder();
     if ($driverRegistry->registerDriverClass(
         \VerteXVaaR\FalSftp\Driver\SftpDriver::class,
-        'sftp',
+        'Sftp',
         'SFTP Driver',
-        'FILE:EXT:falsftp/Configuration/Resource/Driver/SftpDriverFlexForm.xml'
-    )) {
+        $flexBuilder->getFlexConfiguration()
+    )
+    ) {
         $driverRegistry->addDriversToTCA();
     }
 };

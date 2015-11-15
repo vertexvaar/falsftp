@@ -11,11 +11,23 @@
             <trans-unit id="flexform.general.hostname">
                 <source>Hostname</source>
             </trans-unit>
+            <trans-unit id="flexform.general.port">
+                <source>Port</source>
+            </trans-unit>
             <trans-unit id="flexform.general.username">
                 <source>Username</source>
             </trans-unit>
-            <trans-unit id="flexform.general.basePath">
-                <source>Base path</source>
+            <trans-unit id="flexform.general.fileMode">
+                <source>File Mode</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.folderMode">
+                <source>Folder Mode</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.rootLevel">
+                <source>Root Level</source>
+            </trans-unit>
+            <trans-unit id="flexform.general.publicUrl">
+                <source>Public URL</source>
             </trans-unit>
             <trans-unit id="flexform.general.authenticationMethod">
                 <source>Authentication Method</source>

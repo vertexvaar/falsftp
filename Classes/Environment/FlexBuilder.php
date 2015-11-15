@@ -1,4 +1,34 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?php
+namespace VerteXVaaR\FalSftp\Environment;
+
+use VerteXVaaR\FalSftp\Driver\SftpDriver;
+
+/**
+ * Class FlexBuilder
+ */
+class FlexBuilder
+{
+    /**
+     * @return string
+     */
+    public function getFlexConfiguration()
+    {
+        $generalFields = [];
+        foreach (['hostname', 'port', 'username', 'folderMode', 'fileMode', SftpDriver::CONFIG_ROOT_LEVEL] as $fieldName) {
+            $generalFields[] = '
+                    <' . $fieldName. '>
+                        <TCEforms>
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . $fieldName. '</label>
+                            <config>
+                                <type>input</type>
+                                <size>33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </' . $fieldName. '>';
+        }
+
+        $flex = '<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <T3DataStructure>
     <sheets>
         <general>
@@ -8,42 +38,21 @@
                 </TCEforms>
                 <type>array</type>
                 <el>
-                    <hostname>
+                    ' . implode(PHP_EOL, $generalFields) . '
+                    <' . SftpDriver::CONFIG_PUBLIC_URL . '>
                         <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.hostname</label>
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_PUBLIC_URL . '</label>
                             <config>
                                 <type>input</type>
                                 <size>33</size>
-                                <eval>trim,required</eval>
+                                <eval>trim</eval>
                             </config>
                         </TCEforms>
-                    </hostname>
+                    </' . SftpDriver::CONFIG_PUBLIC_URL . '>
 
-                    <username>
+                    <' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '>
                         <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.username</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim,required</eval>
-                            </config>
-                        </TCEforms>
-                    </username>
-
-                    <basePath>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.basePath</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim,required</eval>
-                            </config>
-                        </TCEforms>
-                    </basePath>
-
-                    <authenticationMethod>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.authenticationMethod</label>
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '</label>
                             <onChange>reload</onChange>
                             <config>
                                 <type>select</type>
@@ -54,21 +63,21 @@
                                     </numIndex>
                                     <numIndex index="1" type="array">
                                         <numIndex index="0">Password</numIndex>
-                                        <numIndex index="1">password</numIndex>
+                                        <numIndex index="1">' . SftpDriver::AUTHENTICATION_PASSWORD . '</numIndex>
                                     </numIndex>
                                     <numIndex index="2" type="array">
                                         <numIndex index="0">Public Key</numIndex>
-                                        <numIndex index="1">pubkey</numIndex>
+                                        <numIndex index="1">' . SftpDriver::AUTHENTICATION_PUBKEY . '</numIndex>
                                     </numIndex>
                                 </items>
                                 <eval>required</eval>
                             </config>
                         </TCEforms>
-                    </authenticationMethod>
+                    </' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '>
 
-                    <adapter>
+                    <' . SftpDriver::CONFIG_ADAPTER . '>
                         <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.adapter</label>
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_ADAPTER . '</label>
                             <config>
                                 <type>select</type>
                                 <itemsProcFunc>VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection</itemsProcFunc>
@@ -81,7 +90,7 @@
                                 <eval>required</eval>
                             </config>
                         </TCEforms>
-                    </adapter>
+                    </' . SftpDriver::CONFIG_ADAPTER . '>
                 </el>
             </ROOT>
         </general>
@@ -89,7 +98,7 @@
             <ROOT>
                 <TCEforms>
                     <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password</sheetTitle>
-                    <displayCond><![CDATA[FIELD:general.authenticationMethod:=:password]]></displayCond>
+                    <displayCond>FIELD:general.authenticationMethod:=:' . SftpDriver::AUTHENTICATION_PASSWORD . '</displayCond>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -110,7 +119,7 @@
             <ROOT>
                 <TCEforms>
                     <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey</sheetTitle>
-                    <displayCond><![CDATA[FIELD:general.authenticationMethod:=:pubkey]]></displayCond>
+                    <displayCond>FIELD:general.authenticationMethod:=:' . SftpDriver::AUTHENTICATION_PUBKEY . '</displayCond>
                 </TCEforms>
                 <type>array</type>
                 <el>
@@ -149,3 +158,7 @@
         </pubkey>
     </sheets>
 </T3DataStructure>
+';
+        return str_replace(PHP_EOL, '', $flex);
+    }
+}
