@@ -201,4 +201,23 @@ class PhpSshAdapter implements AdapterInterface
             1447607200
         );
     }
+
+    /**
+     * @param string $source
+     * @param string $identifier
+     * @return string
+     */
+    public function uploadFile($source, $identifier)
+    {
+        return ssh2_scp_send($this->ssh, $source, $identifier, $this->configuration['fileMode']);
+    }
+
+    /**
+     * @param string $identifier
+     * @return void
+     */
+    public function dumpFile($identifier)
+    {
+        readfile($this->sftpWrapper . $identifier);
+    }
 }

@@ -2,6 +2,7 @@
 namespace VerteXVaaR\FalSftp\Driver;
 
 use TYPO3\CMS\Core\Resource\Driver\AbstractHierarchicalFilesystemDriver;
+use TYPO3\CMS\Core\Resource\Exception\InvalidFileNameException;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -21,6 +22,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     const CONFIG_ROOT_LEVEL = 'rootLevel';
     const CONFIG_ADAPTER = 'adapter';
     const CONFIG_AUTHENTICATION_METHOD = 'authenticationMethod';
+    const UNSAFE_FILENAME_CHARACTER_EXPRESSION = '\\x00-\\x2C\\/\\x3A-\\x3F\\x5B-\\x60\\x7B-\\xBF';
 
     /**
      * @var array
@@ -213,7 +215,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function addFile($localFilePath, $targetFolderIdentifier, $newFileName = '', $removeOriginal = true)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $localFilePath = $this->canonicalizeAndCheckFilePath($localFilePath);
+        $targetFileIdentifier = $targetFolderIdentifier . $this->sanitizeFileName($newFileName);
+        $identifier = $this->canonicalizeAndCheckFileIdentifier(
+            $this->rootPath . $targetFileIdentifier
+        );
+        if ($this->adapter->uploadFile($localFilePath, $identifier) && $removeOriginal) {
+            unlink($removeOriginal);
+        }
+        return $targetFileIdentifier;
     }
 
     /**
@@ -433,7 +443,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function dumpFileContents($identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $this->adapter->dumpFile($this->canonicalizeAndCheckFileIdentifier($this->rootPath . $identifier));
     }
 
     /**
@@ -543,7 +553,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFileInFolder($fileName, $folderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        return $this->canonicalizeAndCheckFileIdentifier($folderIdentifier . '/' . $fileName);
     }
 
     /**
@@ -756,5 +766,78 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $items = $this->adapter->scanDirectory($folderIdentifier, false, true, $recursive);
         $items = $this->filterItems($items, $folderNameFilterCallbacks);
         return count($items);
+    }
+
+    /**
+     * Copied from LocalDriver
+     *
+     * @param string $fileName
+     * @param string $charset
+     * @return mixed|string
+     * @throws InvalidFileNameException
+     */
+    public function sanitizeFileName($fileName, $charset = '')
+    {
+        // Handle UTF-8 characters
+        if ($GLOBALS['TYPO3_CONF_VARS']['SYS']['UTF8filesystem']) {
+            // Allow ".", "-", 0-9, a-z, A-Z and everything beyond U+C0 (latin capital letter a with grave)
+            $cleanFileName = preg_replace(
+                '/[' . self::UNSAFE_FILENAME_CHARACTER_EXPRESSION . ']/u',
+                '_',
+                trim($fileName)
+            );
+        } else {
+            // Define character set
+            if (!$charset) {
+                if (TYPO3_MODE === 'FE') {
+                    $charset = $GLOBALS['TSFE']->renderCharset;
+                } else {
+                    // default for Backend
+                    $charset = 'utf-8';
+                }
+            }
+            // If a charset was found, convert fileName
+            if ($charset) {
+                $fileName = $this->getCharsetConversion()->specCharsToASCII($charset, $fileName);
+            }
+            // Replace unwanted characters by underscores
+            $cleanFileName = preg_replace(
+                '/[' . self::UNSAFE_FILENAME_CHARACTER_EXPRESSION . '\\xC0-\\xFF]/',
+                '_',
+                trim($fileName)
+            );
+        }
+        // Strip trailing dots and return
+        $cleanFileName = rtrim($cleanFileName, '.');
+        if ($cleanFileName === '') {
+            throw new InvalidFileNameException(
+                'File name ' . $fileName . ' is invalid.',
+                1320288991
+            );
+        }
+        return $cleanFileName;
+    }
+
+    /**
+     * Gets the charset conversion object.
+     *
+     * @return \TYPO3\CMS\Core\Charset\CharsetConverter
+     */
+    protected function getCharsetConversion()
+    {
+        if (!isset($this->charsetConversion)) {
+            if (TYPO3_MODE === 'FE') {
+                $this->charsetConversion = $GLOBALS['TSFE']->csConvObj;
+            } elseif (is_object($GLOBALS['LANG'])) {
+                // BE assumed:
+                $this->charsetConversion = $GLOBALS['LANG']->csConvObj;
+            } else {
+                // The object may not exist yet, so we need to create it now. Happens in the Install Tool for example.
+                $this->charsetConversion = GeneralUtility::makeInstance(
+                    \TYPO3\CMS\Core\Charset\CharsetConverter::class
+                );
+            }
+        }
+        return $this->charsetConversion;
     }
 }

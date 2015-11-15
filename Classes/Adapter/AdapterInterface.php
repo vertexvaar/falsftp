@@ -59,4 +59,17 @@ interface AdapterInterface
      * @return string
      */
     public function downloadFile($identifier, $target);
+
+    /**
+     * @param string $source
+     * @param string $identifier
+     * @return string
+     */
+    public function uploadFile($source, $identifier);
+
+    /**
+     * @param string $identifier
+     * @return void
+     */
+    public function dumpFile($identifier);
 }
