@@ -92,4 +92,11 @@ interface AdapterInterface
      * @return bool
      */
     public function rename($oldIdentifier, $newIdentifier);
+
+    /**
+     * @param string $sourceIdentifier
+     * @param string $targetIdentifier
+     * @return bool
+     */
+    public function copy($sourceIdentifier, $targetIdentifier);
 }

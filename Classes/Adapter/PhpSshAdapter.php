@@ -88,7 +88,7 @@ class PhpSshAdapter implements AdapterInterface
         if ($recursive) {
             foreach ($directoryEntries as $directoryEntry) {
                 if ($directoryEntry['type'] === 'dir') {
-                    foreach ($this->scanDirectory($directoryEntry, $files, $folders, $recursive) as $identifier => $info) {
+                    foreach ($this->scanDirectory($directoryEntry['identifier'], $files, $folders, $recursive) as $identifier => $info) {
                         $directoryEntries[$identifier] = $info;
                     }
                 }
@@ -262,5 +262,15 @@ class PhpSshAdapter implements AdapterInterface
             $this->unlink($oldIdentifier, false);
             return false;
         }
+    }
+
+    /**
+     * @param string $sourceIdentifier
+     * @param string $targetIdentifier
+     * @return bool
+     */
+    public function copy($sourceIdentifier, $targetIdentifier)
+    {
+        return copy($this->sftpWrapper . $sourceIdentifier, $this->sftpWrapper . $targetIdentifier);
     }
 }

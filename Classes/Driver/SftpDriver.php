@@ -1,7 +1,9 @@
 <?php
 namespace VerteXVaaR\FalSftp\Driver;
 
+use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Resource\Driver\AbstractHierarchicalFilesystemDriver;
+use TYPO3\CMS\Core\Resource\Exception\FileOperationErrorException;
 use TYPO3\CMS\Core\Resource\Exception\InvalidFileNameException;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -53,7 +55,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $this->configuration['fileMode'] = octdec($this->configuration['fileMode']);
         $this->configuration['folderMode'] = octdec($this->configuration['folderMode']);
         $this->rootPath = '/' . trim($this->configuration[self::CONFIG_ROOT_LEVEL], '/') . '/';
-        $this->rootPathLength = strlen($this->rootPath);
+        $this->rootPathLength = strlen($this->rootPath) - 1;
         if (!empty($this->configuration[self::CONFIG_PUBLIC_URL])) {
             $this->capabilities =
                 ResourceStorageInterface::CAPABILITY_BROWSABLE
@@ -111,6 +113,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function getDefaultFolder()
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -151,7 +154,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function renameFolder($folderIdentifier, $newName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $parentFolder = $this->canonicalizeAndCheckFolderIdentifier(PathUtility::dirname($folderIdentifier));
+        $oldIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolder . PathUtility::basename($folderIdentifier));
+        $newIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolder . PathUtility::basename($this->sanitizeFileName($newName)));
+        $oldFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $oldIdentifier);
+        $newFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $newIdentifier);
+        $this->adapter->rename($oldFolderIdentifier, $newFolderIdentifier);
+        $items = $this->adapter->scanDirectory($newFolderIdentifier, true, true, true);
+        $map = $this->createIdentifierMap($items, $oldIdentifier, $newIdentifier);
+        return $map;
     }
 
     /**
@@ -264,7 +275,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function copyFileWithinStorage($fileIdentifier, $targetFolderIdentifier, $fileName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $sourceIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        /*
+         * no need to sanitize the identifier since it has been either
+         * sanitized by upload or rename
+         */
+        $newIdentifier = $targetFolderIdentifier . $fileName;
+        $targetIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $newIdentifier);
+        $this->adapter->copy($sourceIdentifier, $targetIdentifier);
+        return $newIdentifier;
     }
 
     /**
@@ -276,7 +295,13 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function renameFile($fileIdentifier, $newName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $folder = $this->canonicalizeAndCheckFolderIdentifier(PathUtility::dirname($fileIdentifier));
+
+        $identifier = $this->canonicalizeAndCheckFileIdentifier($folder . $this->sanitizeFileName($newName));
+        $oldIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        $newIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $identifier);
+        $this->adapter->rename($oldIdentifier, $newIdentifier);
+        return $identifier;
     }
 
     /**
@@ -289,6 +314,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function replaceFile($fileIdentifier, $localFilePath)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -301,7 +327,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function deleteFile($fileIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        return $this->adapter->unlink($fileIdentifier, false);
     }
 
     /**
@@ -330,6 +357,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function moveFileWithinStorage($fileIdentifier, $targetFolderIdentifier, $newFileName)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -343,6 +371,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function moveFolderWithinStorage($sourceFolderIdentifier, $targetFolderIdentifier, $newFolderName)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -356,6 +385,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function copyFolderWithinStorage($sourceFolderIdentifier, $targetFolderIdentifier, $newFolderName)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -445,7 +475,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         return $this->adapter->downloadFile(
             $fileIdentifier,
             GeneralUtility::tempnam(
-                'fal-tempfile-',
+                'fal-tempfile-' . ($writable ? 'w' : ''),
                 '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
             )
         );
@@ -556,7 +586,9 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $information['identifier'] = $originalIdentifier;
         $information['storage'] = $this->storageUid;
         $information['identifier_hash'] = $this->hashIdentifier($originalIdentifier);
-        $information['folder_hash'] = $this->hashIdentifier($this->getParentFolderIdentifierOfIdentifier($originalIdentifier));
+        $information['folder_hash'] = $this->hashIdentifier(
+            $this->getParentFolderIdentifierOfIdentifier($originalIdentifier)
+        );
         return $information;
     }
 
@@ -603,8 +635,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      * @param bool $sortRev TRUE to indicate reverse sorting (last to first)
      * @return array of FileIdentifiers
      */
-    public function getFilesInFolder($folderIdentifier, $start = 0, $numberOfItems = 0, $recursive = false, array $filenameFilterCallbacks = array(), $sort = '', $sortRev = false)
-    {
+    public function getFilesInFolder(
+        $folderIdentifier,
+        $start = 0,
+        $numberOfItems = 0,
+        $recursive = false,
+        array $filenameFilterCallbacks = array(),
+        $sort = '',
+        $sortRev = false
+    ) {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, true, false, $recursive);
         $items = $this->processResults($items, $sort, $sortRev, $start, $numberOfItems, $filenameFilterCallbacks);
@@ -621,6 +660,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function getFolderInFolder($folderName, $folderIdentifier)
     {
         \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        die;
     }
 
     /**
@@ -775,8 +815,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      * @param array $filenameFilterCallbacks callbacks for filtering the items
      * @return int Number of files in folder
      */
-    public function countFilesInFolder($folderIdentifier, $recursive = false, array $filenameFilterCallbacks = array())
-    {
+    public function countFilesInFolder(
+        $folderIdentifier,
+        $recursive = false,
+        array $filenameFilterCallbacks = array()
+    ) {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, true, false, $recursive);
         $items = $this->filterItems($items, $filenameFilterCallbacks);
@@ -791,8 +834,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      * @param array $folderNameFilterCallbacks callbacks for filtering the items
      * @return int Number of folders in folder
      */
-    public function countFoldersInFolder($folderIdentifier, $recursive = false, array $folderNameFilterCallbacks = array())
-    {
+    public function countFoldersInFolder(
+        $folderIdentifier,
+        $recursive = false,
+        array $folderNameFilterCallbacks = array()
+    ) {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, false, true, $recursive);
         $items = $this->filterItems($items, $folderNameFilterCallbacks);
@@ -852,7 +898,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     /**
      * Gets the charset conversion object.
      *
-     * @return \TYPO3\CMS\Core\Charset\CharsetConverter
+     * @return CharsetConverter
      */
     protected function getCharsetConversion()
     {
@@ -864,11 +910,37 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                 $this->charsetConversion = $GLOBALS['LANG']->csConvObj;
             } else {
                 // The object may not exist yet, so we need to create it now. Happens in the Install Tool for example.
-                $this->charsetConversion = GeneralUtility::makeInstance(
-                    \TYPO3\CMS\Core\Charset\CharsetConverter::class
-                );
+                $this->charsetConversion = GeneralUtility::makeInstance(CharsetConverter::class);
             }
         }
         return $this->charsetConversion;
+    }
+
+    /**
+     * Copied from LocalDriver
+     *
+     * @param array $items
+     * @param string $sourceIdentifier
+     * @param string $targetIdentifier
+     * @return array
+     * @throws FileOperationErrorException
+     */
+    protected function createIdentifierMap(array $items, $sourceIdentifier, $targetIdentifier)
+    {
+        $identifierMap = array();
+        $identifierMap[$sourceIdentifier] = $targetIdentifier;
+        foreach ($items as $item) {
+            $newIdentifier = substr($item['identifier'], $this->rootPathLength);
+            $oldIdentifier = str_replace($targetIdentifier, $sourceIdentifier, $newIdentifier);
+            if ($item['type'] == 'dir') {
+                $newIdentifier = $this->canonicalizeAndCheckFolderIdentifier($newIdentifier);
+            } elseif ($item['type'] == 'file') {
+                $newIdentifier = $this->canonicalizeAndCheckFileIdentifier($newIdentifier);
+            } else {
+                continue;
+            }
+            $identifierMap[$oldIdentifier] = $newIdentifier;
+        }
+        return $identifierMap;
     }
 }
