@@ -84,7 +84,7 @@ interface AdapterInterface
      * @param string $identifier
      * @return string
      */
-    public function getFileContents($identifier);
+    public function readFile($identifier);
 
     /**
      * @param string $oldIdentifier

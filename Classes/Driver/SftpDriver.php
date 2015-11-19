@@ -400,7 +400,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function getFileContents($fileIdentifier)
     {
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
-        return $this->adapter->getFileContents($fileIdentifier);
+        return $this->adapter->readFile($fileIdentifier);
     }
 
     /**

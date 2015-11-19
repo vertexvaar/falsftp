@@ -243,7 +243,7 @@ class PhpSshAdapter implements AdapterInterface
      * @param string $identifier
      * @return string
      */
-    public function getFileContents($identifier)
+    public function readFile($identifier)
     {
         return file_get_contents($this->sftpWrapper . $identifier);
     }
