@@ -175,7 +175,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function deleteFolder($folderIdentifier, $deleteRecursively = false)
     {
         $folderIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier);
-        return $this->adapter->unlink($folderIdentifier, $deleteRecursively);
+        return $this->adapter->delete($folderIdentifier, $deleteRecursively);
     }
 
     /**
@@ -328,7 +328,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function deleteFile($fileIdentifier)
     {
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
-        return $this->adapter->unlink($fileIdentifier, false);
+        return $this->adapter->delete($fileIdentifier, false);
     }
 
     /**

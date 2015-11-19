@@ -228,7 +228,7 @@ class PhpSshAdapter implements AdapterInterface
      * @param bool $recursive
      * @return bool
      */
-    public function unlink($identifier, $recursive)
+    public function delete($identifier, $recursive)
     {
         if (is_dir($this->sftpWrapper . $identifier)) {
             return ssh2_sftp_rmdir($this->sftp, $identifier);
@@ -255,11 +255,11 @@ class PhpSshAdapter implements AdapterInterface
      */
     public function rename($oldIdentifier, $newIdentifier)
     {
-        $this->unlink($newIdentifier, false);
+        $this->delete($newIdentifier, false);
         if (ssh2_sftp_rename($this->sftp, $oldIdentifier, $newIdentifier)) {
             return true;
         } else {
-            $this->unlink($oldIdentifier, false);
+            $this->delete($oldIdentifier, false);
             return false;
         }
     }

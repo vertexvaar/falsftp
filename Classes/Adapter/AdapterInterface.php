@@ -78,7 +78,7 @@ interface AdapterInterface
      * @param bool $recursive
      * @return bool
      */
-    public function unlink($identifier, $recursive);
+    public function delete($identifier, $recursive);
 
     /**
      * @param string $identifier
