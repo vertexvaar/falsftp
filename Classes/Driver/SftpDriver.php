@@ -317,8 +317,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function replaceFile($fileIdentifier, $localFilePath)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $contents = file_get_contents($localFilePath);
+        return mb_strlen($contents) === $this->setFileContents($fileIdentifier, $contents);
     }
 
     /**
