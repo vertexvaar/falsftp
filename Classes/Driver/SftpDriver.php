@@ -360,8 +360,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function moveFileWithinStorage($fileIdentifier, $targetFolderIdentifier, $newFileName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
+        $newFileIdentifier = $targetFolderIdentifier . $newFileName;
+        $targetIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $newFileIdentifier);
+        $this->adapter->rename($fileIdentifier, $targetIdentifier);
+        return $newFileIdentifier;
     }
 
     /**
