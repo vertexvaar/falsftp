@@ -112,8 +112,12 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getDefaultFolder()
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $defaultFolder = '/user_upload/';
+        $identifier = $this->rootPath . $defaultFolder;
+        if (!$this->folderExists($identifier)) {
+            $this->adapter->createFolder($identifier);
+        }
+        return $defaultFolder;
     }
 
     /**

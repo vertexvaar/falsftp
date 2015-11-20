@@ -131,7 +131,7 @@ class PhpSshAdapter implements AdapterInterface
      * @param bool $recursive
      * @return string
      */
-    public function createFolder($identifier, $recursive)
+    public function createFolder($identifier, $recursive = true)
     {
         ssh2_sftp_mkdir($this->sftp, $identifier, $this->configuration['folderMode'], $recursive);
         return $identifier;

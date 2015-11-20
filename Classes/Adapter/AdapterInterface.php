@@ -30,7 +30,7 @@ interface AdapterInterface
      * @param bool $recursive
      * @return string
      */
-    public function createFolder($identifier, $recursive);
+    public function createFolder($identifier, $recursive = true);
 
     /**
      * @param string $identifier
