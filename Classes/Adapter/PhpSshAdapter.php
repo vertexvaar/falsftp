@@ -267,6 +267,21 @@ class PhpSshAdapter implements AdapterInterface
      */
     public function copy($sourceIdentifier, $targetIdentifier)
     {
-        return copy($this->sftpWrapper . $sourceIdentifier, $this->sftpWrapper . $targetIdentifier);
+        $oldIdentifier = $this->sftpWrapper . $sourceIdentifier;
+        $newIdentifier = $this->sftpWrapper . $targetIdentifier;
+        if (is_dir($oldIdentifier)) {
+            $items = $this->scanDirectory($sourceIdentifier, true, true, true);
+            foreach ($items as $item) {
+                $source = $item['identifier'];
+                $target = str_replace($sourceIdentifier, $targetIdentifier, $source);
+                if (is_dir($this->sftpWrapper . $source)) {
+                    $this->createFolder($target);
+                } else {
+                    copy($this->sftpWrapper . $source, $this->sftpWrapper . $target);
+                }
+            }
+        } else {
+            return copy($oldIdentifier, $newIdentifier);
+        }
     }
 }

@@ -159,8 +159,12 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function renameFolder($folderIdentifier, $newName)
     {
         $parentFolder = $this->canonicalizeAndCheckFolderIdentifier(PathUtility::dirname($folderIdentifier));
-        $oldIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolder . PathUtility::basename($folderIdentifier));
-        $newIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolder . PathUtility::basename($this->sanitizeFileName($newName)));
+        $oldIdentifier = $this->canonicalizeAndCheckFolderIdentifier(
+            $parentFolder . PathUtility::basename($folderIdentifier)
+        );
+        $newIdentifier = $this->canonicalizeAndCheckFolderIdentifier(
+            $parentFolder . PathUtility::basename($this->sanitizeFileName($newName))
+        );
         $oldFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $oldIdentifier);
         $newFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $newIdentifier);
         $this->adapter->rename($oldFolderIdentifier, $newFolderIdentifier);
@@ -397,8 +401,13 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function copyFolderWithinStorage($sourceFolderIdentifier, $targetFolderIdentifier, $newFolderName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $sourceFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier(
+            $this->rootPath . $sourceFolderIdentifier
+        );
+        $targetFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier(
+            $this->rootPath . $targetFolderIdentifier . $newFolderName
+        );
+        return $this->adapter->copy($sourceFolderIdentifier, $targetFolderIdentifier);
     }
 
     /**
@@ -672,8 +681,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFolderInFolder($folderName, $folderIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier . '/' . $folderName);
+        return $folderIdentifier;
     }
 
     /**
