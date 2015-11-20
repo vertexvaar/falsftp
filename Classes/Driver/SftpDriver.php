@@ -377,8 +377,14 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function moveFolderWithinStorage($sourceFolderIdentifier, $targetFolderIdentifier, $newFolderName)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__FUNCTION__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        $oldIdentifier = $sourceFolderIdentifier;
+        $sourceIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $sourceFolderIdentifier);
+        $newIdentifier = $targetFolderIdentifier . $newFolderName;
+        $targetIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $newIdentifier);
+        $this->adapter->rename($sourceIdentifier, $targetIdentifier);
+        $items = $this->adapter->scanDirectory($targetIdentifier, true, true, true);
+        $map = $this->createIdentifierMap($items, $oldIdentifier, $newIdentifier);
+        return $map;
     }
 
     /**
@@ -941,8 +947,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $oldIdentifier = str_replace($targetIdentifier, $sourceIdentifier, $newIdentifier);
             if ($item['type'] == 'dir') {
                 $newIdentifier = $this->canonicalizeAndCheckFolderIdentifier($newIdentifier);
+                $oldIdentifier = $this->canonicalizeAndCheckFolderIdentifier($oldIdentifier);
             } elseif ($item['type'] == 'file') {
                 $newIdentifier = $this->canonicalizeAndCheckFileIdentifier($newIdentifier);
+                $oldIdentifier = $this->canonicalizeAndCheckFileIdentifier($oldIdentifier);
             } else {
                 continue;
             }
