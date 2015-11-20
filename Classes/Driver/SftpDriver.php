@@ -187,7 +187,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function fileExists($fileIdentifier)
     {
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
-        return $this->adapter->fileExists($fileIdentifier);
+        return $this->adapter->exists($fileIdentifier);
     }
 
     /**
@@ -199,7 +199,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function folderExists($folderIdentifier)
     {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
-        return $this->adapter->folderExists($this->getRootLevelFolder() . $folderIdentifier);
+        return $this->adapter->exists($this->getRootLevelFolder() . $folderIdentifier, AdapterInterface::TYPE_FOLDER);
     }
 
     /**
@@ -422,7 +422,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $temporaryIdentifier = $this->canonicalizeAndCheckFileIdentifier(
                 $this->rootPath . 'fal-tempfile-' . str_replace('/', '_', $fileIdentifier) . mt_rand(1, PHP_INT_MAX)
             );
-        } while ($this->adapter->fileExists($temporaryIdentifier));
+        } while ($this->adapter->exists($temporaryIdentifier));
 
         $this->adapter->uploadFile($temporaryFile, $temporaryIdentifier);
         unlink($temporaryFile);
@@ -442,7 +442,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function fileExistsInFolder($fileName, $folderIdentifier)
     {
         $identifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier . $fileName);
-        return $this->adapter->fileExists($identifier);
+        return $this->adapter->exists($identifier);
     }
 
     /**
@@ -455,7 +455,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function folderExistsInFolder($folderName, $folderIdentifier)
     {
         $identifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier . $folderName);
-        return $this->adapter->folderExists($identifier);
+        return $this->adapter->exists($identifier, AdapterInterface::TYPE_FOLDER);
     }
 
     /**

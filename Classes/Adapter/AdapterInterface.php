@@ -6,6 +6,9 @@ namespace VerteXVaaR\FalSftp\Adapter;
  */
 interface AdapterInterface
 {
+    const TYPE_FILE = 'file';
+    const TYPE_FOLDER = 'folder';
+
     /**
      * @param string $identifier
      * @param bool $files
@@ -17,15 +20,10 @@ interface AdapterInterface
 
     /**
      * @param string $identifier
-     * @return mixed
+     * @param string $type
+     * @return bool
      */
-    public function folderExists($identifier);
-
-    /**
-     * @param string $identifier
-     * @return mixed
-     */
-    public function fileExists($identifier);
+    public function exists($identifier, $type = self::TYPE_FILE);
 
     /**
      * @param string $identifier

@@ -99,22 +99,18 @@ class PhpSshAdapter implements AdapterInterface
 
     /**
      * @param string $identifier
-     * @return mixed
+     * @param string $type
+     * @return bool
      */
-    public function folderExists($identifier)
+    public function exists($identifier, $type = self::TYPE_FILE)
     {
-        $wrappedIdentifier = $this->sftpWrapper . $identifier;
-        return file_exists($wrappedIdentifier) && is_dir($wrappedIdentifier);
-    }
-
-    /**
-     * @param string $identifier
-     * @return mixed
-     */
-    public function fileExists($identifier)
-    {
-        $wrappedIdentifier = $this->sftpWrapper . $identifier;
-        return file_exists($wrappedIdentifier) && is_file($wrappedIdentifier);
+        $identifier = $this->sftpWrapper . $identifier;
+        if ($type === self::TYPE_FILE) {
+            return is_file($identifier);
+        } elseif ($type === self::TYPE_FOLDER) {
+            return is_dir($identifier);
+        }
+        return false;
     }
 
     /**
