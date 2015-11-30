@@ -2,12 +2,11 @@
 namespace VerteXVaaR\FalSftp\Adapter;
 
 use TYPO3\CMS\Core\Type\File\FileInfo;
-use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * Class PhpSshAdapter
  */
-class PhpSshAdapter implements AdapterInterface
+class PhpSshAdapter extends AbstractAdapter
 {
     /**
      * @var string[]|int[]
@@ -135,20 +134,6 @@ class PhpSshAdapter implements AdapterInterface
     {
         ssh2_sftp_mkdir($this->sftp, $identifier, $this->configuration['folderMode'], $recursive);
         return $identifier;
-    }
-
-    /**
-     * @param string $identifier
-     * @param string $type
-     * @return array
-     */
-    protected function getShortInfo($identifier, $type)
-    {
-        return [
-            'identifier' => $identifier,
-            'name' => PathUtility::basename($identifier),
-            'type' => $type,
-        ];
     }
 
     /**

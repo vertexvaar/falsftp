@@ -9,6 +9,7 @@ use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use VerteXVaaR\FalSftp\Adapter\AdapterInterface;
+use VerteXVaaR\FalSftp\Adapter\PhpseclibAdapter;
 use VerteXVaaR\FalSftp\Adapter\PhpSshAdapter;
 
 /**
@@ -77,6 +78,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             case self::ADAPTER_PHPSSH:
                 $this->adapter = new PhpSshAdapter($this->configuration);
                 break;
+            case self::ADAPTER_PHPSECLIB:
+                $this->adapter = new PhpseclibAdapter($this->configuration);
             default:
         }
     }

@@ -10,11 +10,17 @@ interface AdapterInterface
     const TYPE_FOLDER = 'folder';
 
     /**
+     * AdapterInterface constructor.
+     * @param array $configuration
+     */
+    public function __construct(array $configuration);
+
+    /**
      * @param string $identifier
      * @param bool $files
      * @param bool $folders
      * @param bool $recursive
-     * @return mixed
+     * @return array
      */
     public function scanDirectory($identifier, $files = true, $folders = true, $recursive = false);
 
