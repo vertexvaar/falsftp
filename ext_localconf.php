@@ -24,6 +24,7 @@ $bootFalSftp = function () {
     ) {
         $driverRegistry->addDriversToTCA();
     }
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType']['png'] = 'image/png';
 };
 
 $bootFalSftp();

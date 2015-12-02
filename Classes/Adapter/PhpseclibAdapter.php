@@ -3,6 +3,7 @@ namespace VerteXVaaR\FalSftp\Adapter;
 
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
+use TYPO3\CMS\Core\Type\File\FileInfo;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,6 +34,7 @@ class PhpseclibAdapter extends AbstractAdapter
 
     /**
      * AdapterInterface constructor.
+     *
      * @param array $configuration
      */
     public function __construct(array $configuration)
@@ -157,11 +159,37 @@ class PhpseclibAdapter extends AbstractAdapter
         $details['size'] = $this->sftp->size($identifier);
         $details['atime'] = $this->sftp->fileatime($identifier);
         $details['mtime'] = $this->sftp->filemtime($identifier);
-        // phpseclib does not support ctime and will always return null
-        $details['ctime'] = null;
-//        $details['mimetype'] = (string)$fileInfo->getMimeType();
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($details, __CLASS__ . '@' . __LINE__, 20);
-        die;
+        // ctime is not returned by phpseclinb so we just use mtime
+        // because it will mostly be the same.
+        // @see http://www.linux-faqs.info/general/difference-between-mtime-ctime-and-atime
+        $details['ctime'] = $details['mtime'];
+        $details['mimetype'] = false;
+
+        if ($this->sftp->is_file($identifier)) {
+            $fileExtMapping = $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType'];
+            $lcFileExtension = strtolower(substr($identifier, strrpos($identifier, '.') + 1));
+            if (!empty($fileExtMapping[$lcFileExtension])) {
+                $mimeType = $fileExtMapping[$lcFileExtension];
+            }
+        }
+
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuessers'])
+            && is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuesser'])
+        ) {
+            $mimeTypeGuessers = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuesser'];
+            foreach ($mimeTypeGuessers as $mimeTypeGuesser) {
+                $hookParameters = array(
+                    'mimeType' => &$mimeType,
+                );
+
+                GeneralUtility::callUserFunction(
+                    $mimeTypeGuesser,
+                    $hookParameters,
+                    $this
+                );
+            }
+        }
+
         return $details;
     }
 
@@ -172,8 +200,14 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function hash($identifier, $hashAlgorithm)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        switch ($hashAlgorithm) {
+            case 'sha1':
+                return $this->ssh->exec('shasum -a1 "' . $identifier . '"');
+            case 'md5':
+                return $this->ssh->exec('md5 "' . $identifier . '"');
+            default:
+        }
+        return '';
     }
 
     /**
@@ -183,8 +217,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function downloadFile($identifier, $target)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        return ($this->sftp->get($identifier, $target) === true) ? $identifier : '';
     }
 
     /**
@@ -194,8 +227,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function uploadFile($source, $identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        return $this->sftp->put($identifier, $source, SFTP::SOURCE_LOCAL_FILE);
     }
 
     /**
