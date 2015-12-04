@@ -236,8 +236,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function dumpFile($identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        echo $this->sftp->get($identifier);
     }
 
     /**
