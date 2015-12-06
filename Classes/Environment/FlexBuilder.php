@@ -17,6 +17,7 @@ namespace VerteXVaaR\FalSftp\Environment;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use VerteXVaaR\FalSftp\Driver\SftpDriver;
 
 /**
@@ -29,152 +30,183 @@ class FlexBuilder
      */
     public function getFlexConfiguration()
     {
-        $generalFields = [];
-        foreach (['hostname', 'port', 'username', 'folderMode', 'fileMode', SftpDriver::CONFIG_ROOT_LEVEL] as $fieldName) {
-            $generalFields[] = '
-                    <' . $fieldName. '>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . $fieldName. '</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim,required</eval>
-                            </config>
-                        </TCEforms>
-                    </' . $fieldName. '>';
-        }
-
-        $flex = '<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<T3DataStructure>
-    <sheets>
-        <general>
-            <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general</sheetTitle>
-                </TCEforms>
-                <type>array</type>
-                <el>
-                    ' . implode(PHP_EOL, $generalFields) . '
-                    <' . SftpDriver::CONFIG_PUBLIC_URL . '>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_PUBLIC_URL . '</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
-                    </' . SftpDriver::CONFIG_PUBLIC_URL . '>
-
-                    <' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '</label>
-                            <onChange>reload</onChange>
-                            <config>
-                                <type>select</type>
-                                <items type="array">
-                                    <numIndex index="0" type="array">
-                                        <numIndex index="0">Please choose ...</numIndex>
-                                        <numIndex index="1"></numIndex>
-                                    </numIndex>
-                                    <numIndex index="1" type="array">
-                                        <numIndex index="0">Password</numIndex>
-                                        <numIndex index="1">' . SftpDriver::AUTHENTICATION_PASSWORD . '</numIndex>
-                                    </numIndex>
-                                    <numIndex index="2" type="array">
-                                        <numIndex index="0">Public Key</numIndex>
-                                        <numIndex index="1">' . SftpDriver::AUTHENTICATION_PUBKEY . '</numIndex>
-                                    </numIndex>
-                                </items>
-                                <eval>required</eval>
-                            </config>
-                        </TCEforms>
-                    </' . SftpDriver::CONFIG_AUTHENTICATION_METHOD . '>
-
-                    <' . SftpDriver::CONFIG_ADAPTER . '>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.' . SftpDriver::CONFIG_ADAPTER . '</label>
-                            <config>
-                                <type>select</type>
-                                <itemsProcFunc>VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection</itemsProcFunc>
-                                <items type="array">
-                                    <numIndex index="0" type="array">
-                                        <numIndex index="0">Please choose ...</numIndex>
-                                        <numIndex index="1"></numIndex>
-                                    </numIndex>
-                                </items>
-                                <eval>required</eval>
-                            </config>
-                        </TCEforms>
-                    </' . SftpDriver::CONFIG_ADAPTER . '>
-                </el>
-            </ROOT>
-        </general>
-        <password>
-            <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password</sheetTitle>
-                    <displayCond>FIELD:general.authenticationMethod:=:' . SftpDriver::AUTHENTICATION_PASSWORD . '</displayCond>
-                </TCEforms>
-                <type>array</type>
-                <el>
-                    <password>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password.password</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>password,required</eval>
-                            </config>
-                        </TCEforms>
-                    </password>
-                </el>
-            </ROOT>
-        </password>
-        <pubkey>
-            <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey</sheetTitle>
-                    <displayCond>FIELD:general.authenticationMethod:=:' . SftpDriver::AUTHENTICATION_PUBKEY . '</displayCond>
-                </TCEforms>
-                <type>array</type>
-                <el>
-                    <publicKey>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.publicKey</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim,required</eval>
-                            </config>
-                        </TCEforms>
-                    </publicKey>
-                    <privateKey>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.privateKey</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>trim,required</eval>
-                            </config>
-                        </TCEforms>
-                    </privateKey>
-                    <privateKeyPassword>
-                        <TCEforms>
-                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.privateKeyPassword</label>
-                            <config>
-                                <type>input</type>
-                                <size>33</size>
-                                <eval>password</eval>
-                            </config>
-                        </TCEforms>
-                    </privateKeyPassword>
-                </el>
-            </ROOT>
-        </pubkey>
-    </sheets>
-</T3DataStructure>
-';
-        return str_replace(PHP_EOL, '', $flex);
+        $lllFile = 'LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.';
+        $configuration = [
+            'sheets' => [
+                'general' => [
+                    'ROOT' => [
+                        'TCEforms' => [
+                            'sheetTitle' => $lllFile . 'general',
+                        ],
+                        'el' => [
+                            'hostname' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.hostname',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'port' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.port',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'username' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.username',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'folderMode' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.folderMode',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'fileMode' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.fileMode',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'rootLevel' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.rootLevel',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim,required',
+                                    ],
+                                ],
+                            ],
+                            'publicUrl' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.'
+                                               . SftpDriver::CONFIG_PUBLIC_URL,
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'trim',
+                                    ],
+                                ],
+                            ],
+                            'authenticationMethod' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.'
+                                               . SftpDriver::CONFIG_AUTHENTICATION_METHOD,
+                                    'onChange' => 'reload',
+                                    'config' => [
+                                        'type' => 'select',
+                                        'items' => [
+                                            ['Please choose ...', ''],
+                                            ['Password', SftpDriver::AUTHENTICATION_PASSWORD],
+                                            ['Public Key', SftpDriver::AUTHENTICATION_PUBKEY],
+                                        ],
+                                        'eval' => 'required',
+                                    ],
+                                ],
+                            ],
+                            'adapter' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'general.'
+                                               . SftpDriver::CONFIG_ADAPTER,
+                                    'config' => [
+                                        'type' => 'select',
+                                        'itemsProcFunc' => 'VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection',
+                                        'items' => [
+                                            ['Please choose ...', ''],
+                                        ],
+                                        'eval' => 'required',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'password' => [
+                    'ROOT' => [
+                        'TCEforms' => [
+                            'sheetTitle' => $lllFile . 'password',
+                            'displayCond' => 'FIELD:general.authenticationMethod:=:'
+                                             . SftpDriver::AUTHENTICATION_PASSWORD,
+                        ],
+                        'el' => [
+                            'password' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'password.password',
+                                ],
+                                'config' => [
+                                    'type' => 'input',
+                                    'size' => 33,
+                                    'eval' => 'password,required',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'pubkey' => [
+                    'ROOT' => [
+                        'TCEforms' => [
+                            'sheetTitle' => $lllFile . 'pubkey',
+                            'displayCond' => 'FIELD:general.authenticationMethod:=:'
+                                             . SftpDriver::AUTHENTICATION_PUBKEY,
+                        ],
+                        'el' => [
+                            'publicKey' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'pubkey.publicKey',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'password',
+                                    ],
+                                ],
+                            ],
+                            'privateKey' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'pubkey.privateKey',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'password',
+                                    ],
+                                ],
+                            ],
+                            'privateKeyPassword' => [
+                                'TCEforms' => [
+                                    'label' => $lllFile . 'pubkey.privateKeyPassword',
+                                    'config' => [
+                                        'type' => 'input',
+                                        'size' => 33,
+                                        'eval' => 'password',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        return GeneralUtility::array2xml($configuration, '', '', 'T3DataStructure');
     }
 }
