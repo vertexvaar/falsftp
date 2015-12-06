@@ -39,9 +39,9 @@ class FlexBuilder
                             'sheetTitle' => $lllFile . 'general',
                         ],
                         'el' => [
-                            'hostname' => [
+                            SftpDriver::CONFIG_HOSTNAME => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.hostname',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_HOSTNAME,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -49,9 +49,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'port' => [
+                            SftpDriver::CONFIG_PORT => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.port',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_PORT,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -59,9 +59,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'username' => [
+                            SftpDriver::CONFIG_USERNAME => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.username',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_USERNAME,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -69,9 +69,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'folderMode' => [
+                            SftpDriver::CONFIG_FOLDER_MODE => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.folderMode',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_FOLDER_MODE,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -79,9 +79,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'fileMode' => [
+                            SftpDriver::CONFIG_FILE_MODE => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.fileMode',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_FILE_MODE,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -89,9 +89,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'rootLevel' => [
+                            SftpDriver::CONFIG_ROOT_LEVEL => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.rootLevel',
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_ROOT_LEVEL,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -99,10 +99,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'publicUrl' => [
+                            SftpDriver::CONFIG_PUBLIC_URL => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.'
-                                               . SftpDriver::CONFIG_PUBLIC_URL,
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_PUBLIC_URL,
                                     'config' => [
                                         'type' => 'input',
                                         'size' => 33,
@@ -110,10 +109,9 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'authenticationMethod' => [
+                            SftpDriver::CONFIG_AUTHENTICATION_METHOD => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.'
-                                               . SftpDriver::CONFIG_AUTHENTICATION_METHOD,
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_AUTHENTICATION_METHOD,
                                     'onChange' => 'reload',
                                     'config' => [
                                         'type' => 'select',
@@ -126,13 +124,12 @@ class FlexBuilder
                                     ],
                                 ],
                             ],
-                            'adapter' => [
+                            SftpDriver::CONFIG_ADAPTER => [
                                 'TCEforms' => [
-                                    'label' => $lllFile . 'general.'
-                                               . SftpDriver::CONFIG_ADAPTER,
+                                    'label' => $lllFile . 'general.' . SftpDriver::CONFIG_ADAPTER,
                                     'config' => [
                                         'type' => 'select',
-                                        'itemsProcFunc' => 'VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection',
+                                        'itemsProcFunc' => Detector::class . '->getItemsForAdapterSelection',
                                         'items' => [
                                             ['Please choose ...', ''],
                                         ],
@@ -147,8 +144,7 @@ class FlexBuilder
                     'ROOT' => [
                         'TCEforms' => [
                             'sheetTitle' => $lllFile . 'password',
-                            'displayCond' => 'FIELD:general.authenticationMethod:=:'
-                                             . SftpDriver::AUTHENTICATION_PASSWORD,
+                            'displayCond' => 'FIELD:general.authenticationMethod:=:' . SftpDriver::AUTHENTICATION_PASSWORD,
                         ],
                         'el' => [
                             'password' => [

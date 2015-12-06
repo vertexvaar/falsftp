@@ -37,10 +37,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     const ADAPTER_PHPSECLIB = 2;
     const AUTHENTICATION_PASSWORD = 1;
     const AUTHENTICATION_PUBKEY = 2;
-    const CONFIG_PUBLIC_URL = 'publicUrl';
-    const CONFIG_ROOT_LEVEL = 'rootLevel';
     const CONFIG_ADAPTER = 'adapter';
     const CONFIG_AUTHENTICATION_METHOD = 'authenticationMethod';
+    const CONFIG_PUBLIC_URL = 'publicUrl';
+    const CONFIG_FILE_MODE = 'fileMode';
+    const CONFIG_FOLDER_MODE = 'folderMode';
+    const CONFIG_HOSTNAME = 'hostname';
+    const CONFIG_ROOT_LEVEL = 'rootLevel';
+    const CONFIG_PORT = 'port';
+    const CONFIG_USERNAME = 'username';
     const UNSAFE_FILENAME_CHARACTER_EXPRESSION = '\\x00-\\x2C\\/\\x3A-\\x3F\\x5B-\\x60\\x7B-\\xBF';
 
     /**
@@ -65,23 +70,22 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
 
     /**
      * Processes the configuration for this driver.
+     *
      * @return void
      */
     public function processConfiguration()
     {
-        $this->configuration['fileMode'] = octdec($this->configuration['fileMode']);
-        $this->configuration['folderMode'] = octdec($this->configuration['folderMode']);
+        $this->configuration[self::CONFIG_FILE_MODE] = octdec($this->configuration[self::CONFIG_FILE_MODE]);
+        $this->configuration[self::CONFIG_FOLDER_MODE] = octdec($this->configuration[self::CONFIG_FOLDER_MODE]);
         $this->rootPath = '/' . trim($this->configuration[self::CONFIG_ROOT_LEVEL], '/') . '/';
         $this->rootPathLength = strlen($this->rootPath) - 1;
         if (!empty($this->configuration[self::CONFIG_PUBLIC_URL])) {
-            $this->capabilities =
-                ResourceStorageInterface::CAPABILITY_BROWSABLE
-                | ResourceStorageInterface::CAPABILITY_PUBLIC
-                | ResourceStorageInterface::CAPABILITY_WRITABLE;
+            $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
+                                  | ResourceStorageInterface::CAPABILITY_PUBLIC
+                                  | ResourceStorageInterface::CAPABILITY_WRITABLE;
         } else {
-            $this->capabilities =
-                ResourceStorageInterface::CAPABILITY_BROWSABLE
-                | ResourceStorageInterface::CAPABILITY_WRITABLE;
+            $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
+                                  | ResourceStorageInterface::CAPABILITY_WRITABLE;
         }
     }
 
@@ -277,11 +281,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function createFile($fileName, $parentFolderIdentifier)
     {
         $fileName = $this->sanitizeFileName($fileName);
-        $temporaryFile =
-            GeneralUtility::tempnam(
-                'fal-tempfile-',
-                '.' . PathUtility::pathinfo($fileName, PATHINFO_EXTENSION)
-            );
+        $temporaryFile = GeneralUtility::tempnam(
+            'fal-tempfile-',
+            '.' . PathUtility::pathinfo($fileName, PATHINFO_EXTENSION)
+        );
         touch($temporaryFile);
         $fileName = $parentFolderIdentifier . $fileName;
         $identifier = $this->canonicalizeAndCheckFilePath($this->rootPath . $fileName);
@@ -453,11 +456,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function setFileContents($fileIdentifier, $contents)
     {
-        $temporaryFile =
-            GeneralUtility::tempnam(
-                'fal-tempfile-',
-                '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
-            );
+        $temporaryFile = GeneralUtility::tempnam(
+            'fal-tempfile-',
+            '.' . PathUtility::pathinfo($fileIdentifier, PATHINFO_EXTENSION)
+        );
         $bytes = file_put_contents($temporaryFile, $contents);
         do {
             $temporaryIdentifier = $this->canonicalizeAndCheckFileIdentifier(
@@ -604,8 +606,17 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     {
         if (empty($propertiesToExtract)) {
             $propertiesToExtract = array(
-                'size', 'atime', 'atime', 'mtime', 'ctime', 'mimetype', 'name',
-                'identifier', 'identifier_hash', 'storage', 'folder_hash',
+                'size',
+                'atime',
+                'atime',
+                'mtime',
+                'ctime',
+                'mimetype',
+                'name',
+                'identifier',
+                'identifier_hash',
+                'storage',
+                'folder_hash',
             );
         }
         $information = $this->adapter->getDetails($identifier);
@@ -931,8 +942,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $cleanFileName = rtrim($cleanFileName, '.');
         if ($cleanFileName === '') {
             throw new InvalidFileNameException(
-                'File name ' . $fileName . ' is invalid.',
-                1320288991
+                'File name ' . $fileName . ' is invalid.', 1320288991
             );
         }
         return $cleanFileName;
