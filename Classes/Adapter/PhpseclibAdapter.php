@@ -278,7 +278,8 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function copy($sourceIdentifier, $targetIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        return $this->ssh->exec(
+            'cp -RPf ' . escapeshellarg($sourceIdentifier) . ' ' . escapeshellarg($targetIdentifier)
+        ) === '';
     }
 }
