@@ -8,8 +8,19 @@
       "VerteXVaaR\\FalSftp\\": "Classes/"
     }
   },
+  "authors": [
+    {
+      "name": "Oliver Eglseder",
+      "email": "php@vxvr.de",
+      "role": "Developer"
+    }
+  ],
   "require": {
     "php": ">=5.5.0",
     "typo3/cms-core": ">=7.6.1"
+  },
+  "suggest": {
+    "phpseclib/phpseclib": "You need either this package or the ssh2 extension for this driver to work",
+    "ext-ssh2": "Either install the phpseclib package or install this PHP extension. The driver needs at least one."
   }
 }
