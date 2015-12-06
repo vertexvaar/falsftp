@@ -453,8 +453,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         unlink($temporaryFile);
 
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
-        $this->adapter->rename($temporaryIdentifier, $fileIdentifier);
-        return $bytes;
+        if ($this->adapter->rename($temporaryIdentifier, $fileIdentifier)) {
+            return $bytes;
+        }
+        return 0;
     }
 
     /**

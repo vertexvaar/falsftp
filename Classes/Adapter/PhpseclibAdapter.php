@@ -255,8 +255,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function readFile($identifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        return $this->sftp->get($identifier);
     }
 
     /**
@@ -266,8 +265,10 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function rename($oldIdentifier, $newIdentifier)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
-        die;
+        if ($this->exists($newIdentifier)) {
+            $this->delete($newIdentifier, true);
+        }
+        $this->sftp->rename($oldIdentifier, $newIdentifier);
     }
 
     /**
