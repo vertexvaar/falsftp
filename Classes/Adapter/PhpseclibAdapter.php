@@ -31,6 +31,11 @@ class PhpseclibAdapter extends AbstractAdapter
     const READABLE = 4;
 
     /**
+     * @var bool
+     */
+    protected $phpseclibAvailable = false;
+
+    /**
      * @var string[]|int[]
      */
     protected $configuration = [];
@@ -55,6 +60,11 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function __construct(array $configuration)
     {
+        if (class_exists('phpseclib\\Net\\SFTP') && class_exists('phpseclib\Net\SSH2')) {
+            $this->phpseclibAvailable = true;
+        } else {
+            return $this;
+        }
         $this->configuration = $configuration;
         $this->ssh = new SSH2(
             $this->configuration['hostname'],
@@ -89,6 +99,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function scanDirectory($identifier, $files = true, $folders = true, $recursive = false)
     {
+        if (!$this->phpseclibAvailable) {
+            return [];
+        }
         $directoryEntries = [];
         if (!$files && !$folders) {
             return $directoryEntries;
@@ -115,6 +128,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function exists($identifier, $type = self::TYPE_FILE)
     {
+        if (!$this->phpseclibAvailable) {
+            return false;
+        }
         if ($type === self::TYPE_FILE) {
             return $this->sftp->is_file($identifier);
         } elseif ($type === self::TYPE_FOLDER) {
@@ -145,6 +161,10 @@ class PhpseclibAdapter extends AbstractAdapter
             'w' => false,
         ];
 
+        if (!$this->phpseclibAvailable) {
+            return $permissions;
+        }
+
         $filePerms = array_map(
             function ($var) {
                 return (int)$var;
@@ -172,6 +192,9 @@ class PhpseclibAdapter extends AbstractAdapter
     public function getDetails($identifier)
     {
         $details = [];
+        if (!$this->phpseclibAvailable) {
+            return $details;
+        }
         $details['size'] = $this->sftp->size($identifier);
         $details['atime'] = $this->sftp->fileatime($identifier);
         $details['mtime'] = $this->sftp->filemtime($identifier);
@@ -216,6 +239,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function hash($identifier, $hashAlgorithm)
     {
+        if (!$this->phpseclibAvailable) {
+            return '';
+        }
         switch ($hashAlgorithm) {
             case 'sha1':
                 return $this->ssh->exec('shasum -a1 "' . $identifier . '"');
@@ -233,6 +259,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function downloadFile($identifier, $target)
     {
+        if (!$this->phpseclibAvailable) {
+            return '';
+        }
         return ($this->sftp->get($identifier, $target) === true) ? $identifier : '';
     }
 
@@ -243,6 +272,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function uploadFile($source, $identifier)
     {
+        if (!$this->phpseclibAvailable) {
+            return '';
+        }
         return $this->sftp->put($identifier, $source, SFTP::SOURCE_LOCAL_FILE);
     }
 
@@ -252,6 +284,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function dumpFile($identifier)
     {
+        if (!$this->phpseclibAvailable) {
+            return;
+        }
         echo $this->sftp->get($identifier);
     }
 
@@ -262,6 +297,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function delete($identifier, $recursive)
     {
+        if (!$this->phpseclibAvailable) {
+            return false;
+        }
         return $this->sftp->delete($identifier, $recursive);
     }
 
@@ -271,6 +309,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function readFile($identifier)
     {
+        if (!$this->phpseclibAvailable) {
+            return '';
+        }
         return $this->sftp->get($identifier);
     }
 
@@ -281,6 +322,9 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function rename($oldIdentifier, $newIdentifier)
     {
+        if (!$this->phpseclibAvailable) {
+            return false;
+        }
         if ($this->exists($newIdentifier)) {
             $this->delete($newIdentifier, true);
         }
@@ -294,8 +338,12 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function copy($sourceIdentifier, $targetIdentifier)
     {
-        return $this->ssh->exec(
+        if (!$this->phpseclibAvailable) {
+            return false;
+        }
+        $result = $this->ssh->exec(
             'cp -RPf ' . escapeshellarg($sourceIdentifier) . ' ' . escapeshellarg($targetIdentifier)
-        ) === '';
+        );
+        return $result === '';
     }
 }
