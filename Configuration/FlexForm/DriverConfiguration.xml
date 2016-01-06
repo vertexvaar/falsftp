@@ -1,0 +1,199 @@
+<T3DataStructure>
+    <sheets type="array">
+        <general type="array">
+            <ROOT type="array">
+                <TCEforms type="array">
+                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general</sheetTitle>
+                </TCEforms>
+                <el type="array">
+                    <hostname type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.hostname
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </hostname>
+                    <port type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.port
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </port>
+                    <username type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.username
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </username>
+                    <folderMode type="array">
+                        <TCEforms type="array">
+                            <label>
+                                LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.folderMode
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </folderMode>
+                    <fileMode type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.fileMode
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </fileMode>
+                    <rootLevel type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.rootLevel
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim,required</eval>
+                            </config>
+                        </TCEforms>
+                    </rootLevel>
+                    <publicUrl type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.publicUrl
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>trim</eval>
+                            </config>
+                        </TCEforms>
+                    </publicUrl>
+                    <authenticationMethod type="array">
+                        <TCEforms type="array">
+                            <label>
+                                LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.authenticationMethod
+                            </label>
+                            <onChange>reload</onChange>
+                            <config type="array">
+                                <type>select</type>
+                                <items type="array">
+                                    <numIndex index="0" type="array">
+                                        <numIndex index="0">Please choose ...</numIndex>
+                                        <numIndex index="1"></numIndex>
+                                    </numIndex>
+                                    <numIndex index="1" type="array">
+                                        <numIndex index="0">Password</numIndex>
+                                        <numIndex index="1" type="integer">1</numIndex>
+                                    </numIndex>
+                                    <numIndex index="2" type="array">
+                                        <numIndex index="0">Public Key</numIndex>
+                                        <numIndex index="1" type="integer">2</numIndex>
+                                    </numIndex>
+                                </items>
+                                <eval>required</eval>
+                            </config>
+                        </TCEforms>
+                    </authenticationMethod>
+                    <adapter type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.adapter
+                            </label>
+                            <config type="array">
+                                <type>select</type>
+                                <itemsProcFunc>VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection</itemsProcFunc>
+                                <items type="array">
+                                    <numIndex index="0" type="array">
+                                        <numIndex index="0">Please choose ...</numIndex>
+                                        <numIndex index="1"></numIndex>
+                                    </numIndex>
+                                </items>
+                                <eval>required</eval>
+                            </config>
+                        </TCEforms>
+                    </adapter>
+                </el>
+            </ROOT>
+        </general>
+        <password type="array">
+            <ROOT type="array">
+                <TCEforms type="array">
+                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password</sheetTitle>
+                    <displayCond>FIELD:general.authenticationMethod:=:1</displayCond>
+                </TCEforms>
+                <el type="array">
+                    <password type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password.password
+                            </label>
+                        </TCEforms>
+                        <config type="array">
+                            <type>input</type>
+                            <size type="integer">33</size>
+                            <eval>password,required</eval>
+                        </config>
+                    </password>
+                </el>
+            </ROOT>
+        </password>
+        <pubkey type="array">
+            <ROOT type="array">
+                <TCEforms type="array">
+                    <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey</sheetTitle>
+                    <displayCond>FIELD:general.authenticationMethod:=:2</displayCond>
+                </TCEforms>
+                <el type="array">
+                    <publicKey type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.publicKey
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>password</eval>
+                            </config>
+                        </TCEforms>
+                    </publicKey>
+                    <privateKey type="array">
+                        <TCEforms type="array">
+                            <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.privateKey
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>password</eval>
+                            </config>
+                        </TCEforms>
+                    </privateKey>
+                    <privateKeyPassword type="array">
+                        <TCEforms type="array">
+                            <label>
+                                LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.pubkey.privateKeyPassword
+                            </label>
+                            <config type="array">
+                                <type>input</type>
+                                <size type="integer">33</size>
+                                <eval>password</eval>
+                            </config>
+                        </TCEforms>
+                    </privateKeyPassword>
+                </el>
+            </ROOT>
+        </pubkey>
+    </sheets>
+</T3DataStructure>
