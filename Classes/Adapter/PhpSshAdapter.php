@@ -158,7 +158,7 @@ class PhpSshAdapter extends AbstractAdapter
      */
     public function getDetails($identifier)
     {
-        $fileInfo = new FileInfo($identifier);
+        $fileInfo = new FileInfo($this->sftpWrapper . $identifier);
         $details = [];
         $details['size'] = $fileInfo->getSize();
         $details['atime'] = $fileInfo->getATime();
