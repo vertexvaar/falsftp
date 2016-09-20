@@ -18,6 +18,7 @@ namespace VerteXVaaR\FalSftp\Adapter;
  */
 
 use TYPO3\CMS\Core\Type\File\FileInfo;
+use VerteXVaaR\FalSftp\Driver\SftpDriver;
 
 /**
  * Class PhpSshAdapter
@@ -66,8 +67,27 @@ class PhpSshAdapter extends AbstractAdapter
             $this->configuration['hostname'],
             $this->configuration['port']
         );
-        // TODO: respect configuration
-        ssh2_auth_password($this->ssh, $this->configuration['username'], $this->configuration['password']);
+
+        $username = $this->configuration['username'];
+
+        switch ($this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
+            case static::AUTHENTICATION_PASSWORD:
+                ssh2_auth_password($this->ssh, $username, $this->configuration['password']);
+                break;
+            case static::AUTHENTICATION_PUBKEY:
+                $publicKey = $this->configuration['publicKey'];
+                $privateKey = $this->configuration['privateKey'];
+                if (!file_exists($publicKey) || !file_exists($privateKey)) {
+                    return;
+                }
+                $password = $this->configuration['privateKeyPassword'];
+                if (empty($password)) {
+                    $password = null;
+                }
+                ssh2_auth_pubkey_file($this->ssh, $username, $publicKey, $privateKey, $password);
+                break;
+            default:
+        }
         $this->sftp = ssh2_sftp($this->ssh);
         $this->sftpWrapper = 'ssh2.sftp://' . $this->sftp;
         $this->sftpWrapperLength = strlen($this->sftpWrapper);

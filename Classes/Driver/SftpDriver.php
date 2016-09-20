@@ -35,8 +35,6 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
 {
     const ADAPTER_PHPSSH = 1;
     const ADAPTER_PHPSECLIB = 2;
-    const AUTHENTICATION_PASSWORD = 1;
-    const AUTHENTICATION_PUBKEY = 2;
     const CONFIG_ADAPTER = 'adapter';
     const CONFIG_AUTHENTICATION_METHOD = 'authenticationMethod';
     const CONFIG_PUBLIC_URL = 'publicUrl';

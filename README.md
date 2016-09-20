@@ -14,7 +14,7 @@ Multiple storages can be configured.
 * Support for phpseclib (https://github.com/phpseclib/phpseclib)
 * Faster than the old fal_sftp version (which had caching!)
 * Password authentication
-* Pubkey authentication (TDB)
+* Pubkey authentication
 
 ## Installation
 

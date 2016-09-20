@@ -24,6 +24,8 @@ interface AdapterInterface
 {
     const TYPE_FILE = 'file';
     const TYPE_FOLDER = 'folder';
+    const AUTHENTICATION_PASSWORD = 1;
+    const AUTHENTICATION_PUBKEY = 2;
 
     /**
      * AdapterInterface constructor.
