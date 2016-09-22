@@ -229,9 +229,7 @@ class PhpseclibAdapter extends AbstractAdapter
         ) {
             $mimeTypeGuessers = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuesser'];
             foreach ($mimeTypeGuessers as $mimeTypeGuesser) {
-                $hookParameters = array(
-                    'mimeType' => &$mimeType,
-                );
+                $hookParameters = ['mimeType' => &$mimeType];
 
                 GeneralUtility::callUserFunction(
                     $mimeTypeGuesser,

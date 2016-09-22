@@ -160,10 +160,10 @@ class PhpSshAdapter extends AbstractAdapter
     public function getPermissions($identifier)
     {
         $path = $this->sftpWrapper . $identifier;
-        return array(
+        return [
             'r' => (bool)is_readable($path),
             'w' => (bool)is_writable($path),
-        );
+        ];
     }
 
     /**

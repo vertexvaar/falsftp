@@ -16,19 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
     'title' => 'FAL SFTP Driver',
     'description' =>
         'Adds a Driver to your TYPO3 that lets '
         . 'you create and connect to a file storage accessible via SFTP',
     'category' => 'be',
-    'constraints' => array(
-        'depends' => array(
+    'constraints' => [
+        'depends' => [
             'typo3' => '>=7.6.1',
-        ),
-        'conflicts' => array(),
-        'suggests' => array(),
-    ),
+        ],
+        'conflicts' => [],
+        'suggests' => [],
+    ],
     'state' => 'stable',
     'uploadfolder' => false,
     'createDirs' => '',
@@ -37,4 +37,4 @@ $EM_CONF[$_EXTKEY] = array(
     'author_email' => 'php@vxvr.de',
     'author_company' => 'vxvr.de',
     'version' => '2.1.0',
-);
+];

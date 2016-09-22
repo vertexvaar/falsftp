@@ -586,7 +586,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      *                                   If empty all will be extracted
      * @return array
      */
-    public function getFileInfoByIdentifier($fileIdentifier, array $propertiesToExtract = array())
+    public function getFileInfoByIdentifier($fileIdentifier, array $propertiesToExtract = [])
     {
         $originalIdentifier = $fileIdentifier;
         $fileIdentifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $fileIdentifier);
@@ -603,7 +603,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     protected function getDetails($identifier, array $propertiesToExtract, $originalIdentifier)
     {
         if (empty($propertiesToExtract)) {
-            $propertiesToExtract = array(
+            $propertiesToExtract = [
                 'size',
                 'atime',
                 'atime',
@@ -615,7 +615,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                 'identifier_hash',
                 'storage',
                 'folder_hash',
-            );
+            ];
         }
         $information = $this->adapter->getDetails($identifier);
         $information = $this->enrichInformation($information, $originalIdentifier);
@@ -652,11 +652,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFolderInfoByIdentifier($folderIdentifier)
     {
-        return array(
+        return [
             'identifier' => $folderIdentifier,
             'name' => PathUtility::basename($folderIdentifier),
             'storage' => $this->storageUid,
-        );
+        ];
     }
 
     /**
@@ -692,7 +692,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $start = 0,
         $numberOfItems = 0,
         $recursive = false,
-        array $filenameFilterCallbacks = array(),
+        array $filenameFilterCallbacks = [],
         $sort = '',
         $sortRev = false
     ) {
@@ -736,7 +736,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $start = 0,
         $numberOfItems = 0,
         $recursive = false,
-        array $folderNameFilterCallbacks = array(),
+        array $folderNameFilterCallbacks = [],
         $sort = '',
         $sortRev = false
     ) {
@@ -841,7 +841,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                         $info['name'],
                         $identifier,
                         PathUtility::dirname($identifier),
-                        array(),
+                        [],
                         $this
                     );
                     if ($result === -1) {
@@ -870,7 +870,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function countFilesInFolder(
         $folderIdentifier,
         $recursive = false,
-        array $filenameFilterCallbacks = array()
+        array $filenameFilterCallbacks = []
     ) {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, true, false, $recursive);
@@ -889,7 +889,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function countFoldersInFolder(
         $folderIdentifier,
         $recursive = false,
-        array $folderNameFilterCallbacks = array()
+        array $folderNameFilterCallbacks = []
     ) {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
         $items = $this->adapter->scanDirectory($folderIdentifier, false, true, $recursive);
@@ -978,7 +978,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     protected function createIdentifierMap(array $items, $sourceIdentifier, $targetIdentifier)
     {
-        $identifierMap = array();
+        $identifierMap = [];
         $identifierMap[$sourceIdentifier] = $targetIdentifier;
         foreach ($items as $item) {
             $newIdentifier = substr($item['identifier'], $this->rootPathLength);
