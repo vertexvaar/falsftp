@@ -18,9 +18,7 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FAL SFTP Driver',
-    'description' =>
-        'Adds a Driver to your TYPO3 that lets '
-        . 'you create and connect to a file storage accessible via SFTP',
+    'description' => 'Adds a Driver to your TYPO3 that lets you create and connect to a file storage accessible via SFTP',
     'category' => 'be',
     'constraints' => [
         'depends' => [
@@ -36,5 +34,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Oliver Eglseder',
     'author_email' => 'php@vxvr.de',
     'author_company' => 'vxvr.de',
-    'version' => '2.1.0',
+    'version' => '2.2.0',
 ];
