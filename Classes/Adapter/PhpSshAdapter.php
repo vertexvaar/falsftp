@@ -127,7 +127,8 @@ class PhpSshAdapter extends AbstractAdapter
         if ($recursive) {
             foreach ($directoryEntries as $directoryEntry) {
                 if ($directoryEntry['type'] === 'dir') {
-                    foreach ($this->scanDirectory($directoryEntry['identifier'], $files, $folders, $recursive) as $identifier => $info) {
+                    $scanResults = $this->scanDirectory($directoryEntry['identifier'], $files, $folders, $recursive);
+                    foreach ($scanResults as $identifier => $info) {
                         $directoryEntries[$identifier] = $info;
                     }
                 }
