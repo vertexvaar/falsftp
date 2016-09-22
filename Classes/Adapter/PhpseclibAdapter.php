@@ -63,7 +63,7 @@ class PhpseclibAdapter extends AbstractAdapter
         if (class_exists('phpseclib\\Net\\SFTP') && class_exists('phpseclib\Net\SSH2')) {
             $this->phpseclibAvailable = true;
         } else {
-            return $this;
+            return;
         }
         $this->configuration = $configuration;
         $this->ssh = new SSH2(
