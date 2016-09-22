@@ -36,14 +36,19 @@ class PhpseclibAdapter extends AbstractAdapter
     protected $phpseclibAvailable = false;
 
     /**
-     * @var string[]|int[]
+     * @var array
      */
     protected $configuration = [];
 
     /**
-     * @var null
+     * @var SSH2
      */
     protected $ssh = null;
+
+    /**
+     * @var SFTP
+     */
+    protected $sftp = null;
 
     /**
      * @var array
@@ -60,7 +65,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function __construct(array $configuration)
     {
-        if (class_exists('phpseclib\\Net\\SFTP') && class_exists('phpseclib\Net\SSH2')) {
+        if (class_exists('phpseclib\\Net\\SFTP') && class_exists('phpseclib\\Net\\SSH2')) {
             $this->phpseclibAvailable = true;
         } else {
             return;
@@ -70,20 +75,20 @@ class PhpseclibAdapter extends AbstractAdapter
             $this->configuration['hostname'],
             $this->configuration['port']
         );
-        $sshConnectend = $this->ssh->login(
+        $sshConnected = $this->ssh->login(
             $this->configuration['username'],
             $this->configuration['password']
         );
-        if ($sshConnectend) {
+        if ($sshConnected) {
             $this->sftp = new SFTP(
                 $this->configuration['hostname'],
                 $this->configuration['port']
             );
-            $sftpConnectend = $this->sftp->login(
+            $sftpConnected = $this->sftp->login(
                 $this->configuration['username'],
                 $this->configuration['password']
             );
-            if ($sftpConnectend) {
+            if ($sftpConnected) {
                 $this->info['userId'] = (int)$this->ssh->exec('echo $EUID');
                 $this->info['groupIds'] = GeneralUtility::intExplode(' ', $this->ssh->exec('echo ${GROUPS[*]}'), true);
             }
@@ -146,7 +151,11 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function createFolder($identifier, $recursive = true)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump([__METHOD__, func_get_args()], __CLASS__ . '@' . __LINE__, 20);
+        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump(
+            [__METHOD__, func_get_args()],
+            __CLASS__ . '@' . __LINE__,
+            20
+        );
         die;
     }
 
@@ -188,6 +197,7 @@ class PhpseclibAdapter extends AbstractAdapter
     /**
      * @param string $identifier
      * @return array
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function getDetails($identifier)
     {
@@ -202,7 +212,8 @@ class PhpseclibAdapter extends AbstractAdapter
         // because it will mostly be the same.
         // @see http://www.linux-faqs.info/general/difference-between-mtime-ctime-and-atime
         $details['ctime'] = $details['mtime'];
-        $details['mimetype'] = false;
+
+        $mimeType = false;
 
         if ($this->sftp->is_file($identifier)) {
             $fileExtMapping = $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType'];
@@ -212,7 +223,8 @@ class PhpseclibAdapter extends AbstractAdapter
             }
         }
 
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuessers'])
+        if (false === $mimeType
+            && isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuessers'])
             && is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuesser'])
         ) {
             $mimeTypeGuessers = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuesser'];
@@ -228,6 +240,7 @@ class PhpseclibAdapter extends AbstractAdapter
                 );
             }
         }
+        $details['mimetype'] = $mimeType;
 
         return $details;
     }
@@ -328,7 +341,7 @@ class PhpseclibAdapter extends AbstractAdapter
         if ($this->exists($newIdentifier)) {
             $this->delete($newIdentifier, true);
         }
-        $this->sftp->rename($oldIdentifier, $newIdentifier);
+        return $this->sftp->rename($oldIdentifier, $newIdentifier);
     }
 
     /**
