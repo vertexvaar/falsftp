@@ -309,4 +309,13 @@ class PhpSshAdapter extends AbstractAdapter
             return copy($oldIdentifier, $newIdentifier);
         }
     }
+
+    /**
+     * "Proper" disconnect
+     * ... nope, there's no such thing as "ssh2_disconnect()"
+     */
+    public function __destruct()
+    {
+        $this->ssh = null;
+    }
 }
