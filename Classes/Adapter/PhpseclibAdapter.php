@@ -357,4 +357,13 @@ class PhpseclibAdapter extends AbstractAdapter
         );
         return $result === '';
     }
+
+    /**
+     * "Proper" disconnect
+     */
+    public function __destruct()
+    {
+        $this->ssh->disconnect();
+        $this->sftp->disconnect();
+    }
 }
