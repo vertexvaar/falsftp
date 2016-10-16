@@ -63,7 +63,13 @@ class PhpSshAdapter extends AbstractAdapter
     public function __construct(array $configuration)
     {
         $this->configuration = $configuration;
+    }
 
+    /**
+     *
+     */
+    public function connect()
+    {
         $this->ssh = ssh2_connect(
             $this->configuration['hostname'],
             $this->configuration['port']

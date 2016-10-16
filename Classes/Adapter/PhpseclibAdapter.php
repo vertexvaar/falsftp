@@ -66,6 +66,13 @@ class PhpseclibAdapter extends AbstractAdapter
             throw new \LogicException('Can not use phpseclib adapter when package is not available', 1476624469);
         }
         $this->configuration = $configuration;
+    }
+
+    /**
+     *
+     */
+    public function connect()
+    {
         $this->ssh = new SSH2(
             $this->configuration['hostname'],
             $this->configuration['port']

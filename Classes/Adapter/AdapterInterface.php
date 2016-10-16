@@ -29,11 +29,18 @@ interface AdapterInterface
 
     /**
      * AdapterInterface constructor.
+     * Do not already connect in this method.
+     *
      * @param array $configuration
      */
     public function __construct(array $configuration);
 
     /**
+     * Establish a connection to the remote host and return true if successful.
+     *
+     * @return bool
+     */
+    public function connect();
      * @param string $identifier
      * @param bool $files
      * @param bool $folders
