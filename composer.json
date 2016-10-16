@@ -16,8 +16,8 @@
     }
   ],
   "require": {
-    "php": ">=5.5.0",
-    "typo3/cms-core": ">=7.6.1"
+    "php": "^5.5.0",
+    "typo3/cms-core": "^7.6.1"
   },
   "suggest": {
     "phpseclib/phpseclib": "You need either this package or the ssh2 extension for this driver to work",
