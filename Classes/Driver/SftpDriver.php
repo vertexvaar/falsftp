@@ -684,10 +684,13 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function getFolderInfoByIdentifier($folderIdentifier)
     {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier);
+        $details = $this->adapter->getDetails($this->rootPath . $folderIdentifier);
         return [
             'identifier' => $folderIdentifier,
             'name' => PathUtility::basename($folderIdentifier),
-            'storage' => $this->storageUid,
+            'mtime' => $details['mtime'],
+            'ctime' => $details['ctime'],
+            'storage' => $this->storageUid
         ];
     }
 
