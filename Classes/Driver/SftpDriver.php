@@ -192,6 +192,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function createFolder($newFolderName, $parentFolderIdentifier = '', $recursive = false)
     {
+        $parentFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolderIdentifier);
         $newFolderName = $this->canonicalizeAndCheckFolderIdentifier($parentFolderIdentifier . $newFolderName);
         $identifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $newFolderName);
         $this->adapter->createFolder($identifier, $recursive);
@@ -287,10 +288,9 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function addFile($localFilePath, $targetFolderIdentifier, $newFileName = '', $removeOriginal = true)
     {
         $localFilePath = $this->canonicalizeAndCheckFilePath($localFilePath);
+        $targetFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($targetFolderIdentifier);
         $targetFileIdentifier = $targetFolderIdentifier . $this->sanitizeFileName($newFileName);
-        $identifier = $this->canonicalizeAndCheckFileIdentifier(
-            $this->rootPath . $targetFileIdentifier
-        );
+        $identifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $targetFileIdentifier);
         if ($this->adapter->uploadFile($localFilePath, $identifier) && $removeOriginal) {
             unlink($localFilePath);
         }
@@ -306,6 +306,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function createFile($fileName, $parentFolderIdentifier)
     {
+        $parentFolderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($parentFolderIdentifier);
         $fileName = $this->sanitizeFileName($fileName);
         $temporaryFile = GeneralUtility::tempnam(
             'fal-tempfile-',
@@ -512,6 +513,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function fileExistsInFolder($fileName, $folderIdentifier)
     {
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier);
         $identifier = $this->canonicalizeAndCheckFileIdentifier($this->rootPath . $folderIdentifier . $fileName);
         return $this->adapter->exists($identifier);
     }
@@ -525,6 +527,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function folderExistsInFolder($folderName, $folderIdentifier)
     {
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier);
         $identifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier . $folderName);
         return $this->adapter->exists($identifier, AdapterInterface::TYPE_FOLDER);
     }
@@ -680,6 +683,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFolderInfoByIdentifier($folderIdentifier)
     {
+        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier);
         return [
             'identifier' => $folderIdentifier,
             'name' => PathUtility::basename($folderIdentifier),
@@ -739,8 +743,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getFolderInFolder($folderName, $folderIdentifier)
     {
-        $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier . '/' . $folderName);
-        return $folderIdentifier;
+        return $this->canonicalizeAndCheckFolderIdentifier($folderIdentifier . '/' . $folderName);
     }
 
     /**
