@@ -19,6 +19,14 @@
     "php": "^5.5.0",
     "typo3/cms-core": "^7.6.1"
   },
+  "replace": {
+    "in2code/fal_sftp": "self.version",
+    "in2code/fal-sftp": "self.version",
+    "in2code/falsftp": "self.version",
+    "typo3-ter/fal_sftp": "self.version",
+    "typo3-ter/fal-sftp": "self.version",
+    "typo3-ter/falsftp": "self.version"
+  },
   "suggest": {
     "phpseclib/phpseclib": "You need either this package or the ssh2 extension for this driver to work",
     "ext-ssh2": "Either install the phpseclib package or install this PHP extension. The driver needs at least one."
