@@ -102,6 +102,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                 default:
             }
 
+            if (true !== $this->adapter->connect()) {
+                throw new InvalidConfigurationException('Could not connect to remote host', 1476629391);
+            }
+
             if (true === $this->configuration[static::CONFIG_EXPERTS]) {
                 if (!empty($this->configuration[static::CONFIG_FOREIGN_KEY_FINGERPRINT])) {
                     $actualFingerprint = $this->adapter->getForeignKeyFingerprint(
