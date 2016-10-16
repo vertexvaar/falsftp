@@ -70,6 +70,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     /**
      * Processes the configuration for this driver.
      *
+     * @throws InvalidConfigurationException
      * @return void
      */
     public function processConfiguration()
