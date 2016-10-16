@@ -71,9 +71,10 @@ class PhpseclibAdapter extends AbstractAdapter
             $this->configuration['port']
         );
 
-        if (static::AUTHENTICATION_PASSWORD === (int)$this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
+        $authenticationMethod = $this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD];
+        if (static::AUTHENTICATION_PASSWORD === (int)$authenticationMethod) {
             $authentication = $this->configuration['password'];
-        } elseif(static::AUTHENTICATION_PUBKEY === (int)$this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
+        } elseif (static::AUTHENTICATION_PUBKEY === (int)$authenticationMethod) {
             $authentication = new RSA();
             if (!empty($this->configuration['privateKeyPassword'])) {
                 $authentication->setPassword($this->configuration['privateKeyPassword']);
@@ -89,6 +90,27 @@ class PhpseclibAdapter extends AbstractAdapter
         );
 
         if ($sshConnected) {
+            if (true === (bool)$this->configuration['experts']) {
+                switch ($this->configuration['foreignKeyFingerprintMethod']) {
+                    case 'sha1':
+                        $method = function ($string) {
+                            return sha1($string);
+                        };
+                        break;
+                    case 'md5':
+                    default:
+                        $method = function ($string) {
+                            return md5($string);
+                        };
+                }
+                $foreignPublicKey = explode(' ', $this->ssh->getServerPublicHostKey());
+                $actualFingerprint = strtoupper($method(base64_decode($foreignPublicKey[1])));
+                $expectedFingerprint = strtoupper(str_replace(':', '', $this->configuration['foreignKeyFingerprint']));
+                if ($actualFingerprint !== $expectedFingerprint) {
+                    throw new \RuntimeException('The configured foreign key fingerprint does not match', 1476622757);
+                }
+            }
+
             $this->sftp = new SFTP(
                 $this->configuration['hostname'],
                 $this->configuration['port']
