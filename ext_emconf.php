@@ -27,7 +27,7 @@ $EM_CONF[$_EXTKEY] = [
         'conflicts' => [],
         'suggests' => [],
     ],
-    'state' => 'stable',
+    'state' => 'alpha',
     'uploadfolder' => false,
     'createDirs' => '',
     'clearcacheonload' => true,
