@@ -17,10 +17,12 @@ namespace VerteXVaaR\FalSftp\Adapter;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 use TYPO3\CMS\Core\Type\File\FileInfo;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use VerteXVaaR\FalSftp\Driver\SftpDriver;
 
 /**
  * Class PhpseclibAdapter
@@ -68,10 +70,24 @@ class PhpseclibAdapter extends AbstractAdapter
             $this->configuration['hostname'],
             $this->configuration['port']
         );
+
+        if (static::AUTHENTICATION_PASSWORD === (int)$this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
+            $authentication = $this->configuration['password'];
+        } elseif(static::AUTHENTICATION_PUBKEY === (int)$this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
+            $authentication = new RSA();
+            if (!empty($this->configuration['privateKeyPassword'])) {
+                $authentication->setPassword($this->configuration['privateKeyPassword']);
+            }
+            $authentication->loadKey(file_get_contents($this->configuration['privateKey']));
+        } else {
+            throw new \LogicException('Wrong authentication type for phpseclibAdapter', 1476626149);
+        }
+
         $sshConnected = $this->ssh->login(
             $this->configuration['username'],
-            $this->configuration['password']
+            $authentication
         );
+
         if ($sshConnected) {
             $this->sftp = new SFTP(
                 $this->configuration['hostname'],
@@ -79,7 +95,7 @@ class PhpseclibAdapter extends AbstractAdapter
             );
             $sftpConnected = $this->sftp->login(
                 $this->configuration['username'],
-                $this->configuration['password']
+                $authentication
             );
             if ($sftpConnected) {
                 $this->info['userId'] = (int)$this->ssh->exec('echo $EUID');
