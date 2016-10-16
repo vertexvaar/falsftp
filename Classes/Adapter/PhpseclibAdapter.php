@@ -60,7 +60,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function __construct(array $configuration)
     {
-        if (class_exists('phpseclib\\Net\\SFTP') && class_exists('phpseclib\\Net\\SSH2')) {
+        if (!class_exists('phpseclib\\Net\\SFTP') || !class_exists('phpseclib\\Net\\SSH2')) {
             throw new \LogicException('Can not use phpseclib adapter when package is not available', 1476624469);
         }
         $this->configuration = $configuration;
