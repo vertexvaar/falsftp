@@ -20,6 +20,7 @@ namespace VerteXVaaR\FalSftp\Driver;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Resource\Driver\AbstractHierarchicalFilesystemDriver;
 use TYPO3\CMS\Core\Resource\Exception\FileOperationErrorException;
+use TYPO3\CMS\Core\Resource\Exception\InvalidConfigurationException;
 use TYPO3\CMS\Core\Resource\Exception\InvalidFileNameException;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -85,6 +86,18 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
                                   | ResourceStorageInterface::CAPABILITY_WRITABLE;
         }
+        try {
+            switch ($this->configuration[self::CONFIG_ADAPTER]) {
+                case self::ADAPTER_PHPSSH:
+                    $this->adapter = new PhpSshAdapter($this->configuration);
+                    break;
+                case self::ADAPTER_PHPSECLIB:
+                    $this->adapter = new PhpseclibAdapter($this->configuration);
+                default:
+            }
+        } catch (\Exception $exception) {
+            throw new InvalidConfigurationException($exception->getMessage(), $exception->getCode());
+        }
     }
 
     /**
@@ -92,14 +105,6 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function initialize()
     {
-        switch ($this->configuration[self::CONFIG_ADAPTER]) {
-            case self::ADAPTER_PHPSSH:
-                $this->adapter = new PhpSshAdapter($this->configuration);
-                break;
-            case self::ADAPTER_PHPSECLIB:
-                $this->adapter = new PhpseclibAdapter($this->configuration);
-            default:
-        }
     }
 
     /**
