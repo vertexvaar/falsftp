@@ -63,13 +63,26 @@ class PhpSshAdapter extends AbstractAdapter
     public function __construct(array $configuration)
     {
         $this->configuration = $configuration;
-        try {
-            $this->ssh = ssh2_connect(
-                $this->configuration['hostname'],
-                $this->configuration['port']
-            );
-        } catch (\Exception $e) {
-            return;
+
+        $this->ssh = ssh2_connect(
+            $this->configuration['hostname'],
+            $this->configuration['port']
+        );
+
+        if (true === (bool)$this->configuration['experts']) {
+            switch ($this->configuration['foreignKeyFingerprintMethod']) {
+                case 'sha1':
+                    $method = SSH2_FINGERPRINT_SHA1;
+                    break;
+                case 'md5':
+                default:
+                    $method = SSH2_FINGERPRINT_MD5;
+            }
+            $actualFingerprint = strtoupper(ssh2_fingerprint($this->ssh, $method));
+            $expectedFingerprint = strtoupper(str_replace(':', '', $this->configuration['foreignKeyFingerprint']));
+            if ($actualFingerprint !== $expectedFingerprint) {
+                throw new \RuntimeException('The configured foreign key fingerprint does not match', 1476622757);
+            }
         }
 
         $username = $this->configuration['username'];
@@ -173,7 +186,7 @@ class PhpSshAdapter extends AbstractAdapter
      */
     public function createFolder($identifier, $recursive = true)
     {
-        ssh2_sftp_mkdir($this->sftp, $identifier, $this->configuration['folderMode'], $recursive);
+        ssh2_sftp_mkdir($this->sftp, $identifier, $this->configuration[SftpDriver::CONFIG_FOLDER_MODE], $recursive);
         return $identifier;
     }
 
@@ -233,7 +246,7 @@ class PhpSshAdapter extends AbstractAdapter
      */
     public function uploadFile($source, $identifier)
     {
-        return ssh2_scp_send($this->ssh, $source, $identifier, $this->configuration['fileMode']);
+        return ssh2_scp_send($this->ssh, $source, $identifier, $this->configuration[SftpDriver::CONFIG_FILE_MODE]);
     }
 
     /**

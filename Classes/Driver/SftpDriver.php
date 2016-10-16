@@ -39,8 +39,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     const CONFIG_ADAPTER = 'adapter';
     const CONFIG_AUTHENTICATION_METHOD = 'authenticationMethod';
     const CONFIG_PUBLIC_URL = 'publicUrl';
-    const CONFIG_FILE_MODE = 'fileMode';
-    const CONFIG_FOLDER_MODE = 'folderMode';
+    const CONFIG_FILE_MODE = 'fileCreateMask';
+    const CONFIG_FOLDER_MODE = 'folderCreateMask';
     const CONFIG_HOSTNAME = 'hostname';
     const CONFIG_ROOT_LEVEL = 'rootLevel';
     const CONFIG_PORT = 'port';
@@ -75,8 +75,6 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function processConfiguration()
     {
-        $this->configuration[self::CONFIG_FILE_MODE] = octdec($this->configuration[self::CONFIG_FILE_MODE]);
-        $this->configuration[self::CONFIG_FOLDER_MODE] = octdec($this->configuration[self::CONFIG_FOLDER_MODE]);
         $this->rootPath = '/' . trim($this->configuration[self::CONFIG_ROOT_LEVEL], '/') . '/';
         $this->rootPathLength = strlen($this->rootPath) - 1;
         if (!empty($this->configuration[self::CONFIG_PUBLIC_URL])) {
@@ -87,6 +85,10 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
                                   | ResourceStorageInterface::CAPABILITY_WRITABLE;
         }
+
+        $this->processCreateMask(self::CONFIG_FILE_MODE);
+        $this->processCreateMask(self::CONFIG_FOLDER_MODE);
+
         try {
             switch ($this->configuration[self::CONFIG_ADAPTER]) {
                 case self::ADAPTER_PHPSSH:
@@ -1001,5 +1003,18 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $identifierMap[$oldIdentifier] = $newIdentifier;
         }
         return $identifierMap;
+    }
+
+    /**
+     * @param string $mode
+     */
+    protected function processCreateMask($mode)
+    {
+        if (empty($this->configuration[$mode])) {
+            $octalString = $GLOBALS['TYPO3_CONF_VARS']['SYS'][$mode];
+        } else {
+            $octalString = $this->configuration[$mode];
+        }
+        $this->configuration[$mode] = octdec($octalString);
     }
 }
