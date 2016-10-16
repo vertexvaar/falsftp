@@ -103,6 +103,8 @@ class PhpSshAdapter extends AbstractAdapter
             | \FilesystemIterator::SKIP_DOTS
             | \FilesystemIterator::CURRENT_AS_FILEINFO
             | \FilesystemIterator::FOLLOW_SYMLINKS;
+
+        return true;
     }
 
     /**

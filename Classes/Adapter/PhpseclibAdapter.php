@@ -108,8 +108,10 @@ class PhpseclibAdapter extends AbstractAdapter
             if ($sftpConnected) {
                 $this->info['userId'] = (int)$this->ssh->exec('echo $EUID');
                 $this->info['groupIds'] = GeneralUtility::intExplode(' ', $this->ssh->exec('echo ${GROUPS[*]}'), true);
+                return true;
             }
         }
+        return false;
     }
 
     /**
