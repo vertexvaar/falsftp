@@ -228,7 +228,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     public function folderExists($folderIdentifier)
     {
         $folderIdentifier = $this->canonicalizeAndCheckFolderIdentifier($this->rootPath . $folderIdentifier);
-        return $this->adapter->exists($this->getRootLevelFolder() . $folderIdentifier, AdapterInterface::TYPE_FOLDER);
+        return $this->adapter->exists($folderIdentifier, AdapterInterface::TYPE_FOLDER);
     }
 
     /**
