@@ -271,6 +271,7 @@ class PhpSshAdapter extends AbstractAdapter
      * @param string $identifier
      * @param bool $recursive
      * @return bool
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function delete($identifier, $recursive)
     {
