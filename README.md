@@ -1,5 +1,4 @@
-TYPO3 FAL SFTP DRIVER
-=====================
+# TYPO3 FAL SFTP DRIVER
 
 ## What does it do?
 
@@ -14,7 +13,7 @@ Multiple storages can be configured.
 * Support for phpseclib (https://github.com/phpseclib/phpseclib)
 * Faster than the old fal_sftp version (which had caching!)
 * Password authentication
-* Pubkey authentication
+* PubKey authentication
 
 ## Installation
 
@@ -38,3 +37,8 @@ AND add following code to your LocalConfiguration.php into the SYS section
     ],
 ],
 ```
+
+## Update information
+
+If you update falsftp from 2.x to 3.x you will need to adjust your driver configuration.
+There is no update script available, so it has to be done manually.
