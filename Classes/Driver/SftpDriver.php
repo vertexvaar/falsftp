@@ -45,6 +45,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     const CONFIG_ROOT_LEVEL = 'rootLevel';
     const CONFIG_PORT = 'port';
     const CONFIG_USERNAME = 'username';
+    const CONFIG_EXPERTS = 'experts';
     const UNSAFE_FILENAME_CHARACTER_EXPRESSION = '\\x00-\\x2C\\/\\x3A-\\x3F\\x5B-\\x60\\x7B-\\xBF';
 
     /**
@@ -1010,7 +1011,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     protected function processCreateMask($mode)
     {
-        if (empty($this->configuration[$mode])) {
+        if (false === (bool)$this->configuration[static::CONFIG_EXPERTS] || empty($this->configuration[$mode])) {
             $octalString = $GLOBALS['TYPO3_CONF_VARS']['SYS'][$mode];
         } else {
             $octalString = $this->configuration[$mode];

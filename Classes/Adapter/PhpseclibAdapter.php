@@ -90,7 +90,7 @@ class PhpseclibAdapter extends AbstractAdapter
         );
 
         if ($sshConnected) {
-            if (true === (bool)$this->configuration['experts']) {
+            if (true === (bool)$this->configuration[SftpDriver::CONFIG_EXPERTS]) {
                 switch ($this->configuration['foreignKeyFingerprintMethod']) {
                     case 'sha1':
                         $method = function ($string) {
