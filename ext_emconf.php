@@ -34,5 +34,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Oliver Eglseder',
     'author_email' => 'php@vxvr.de',
     'author_company' => 'vxvr.de',
-    'version' => '2.2.0',
+    'version' => '2.2.1',
 ];
