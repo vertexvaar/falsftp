@@ -99,7 +99,9 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                     break;
                 case self::ADAPTER_PHPSECLIB:
                     $this->adapter = new PhpseclibAdapter($this->configuration);
+                    break;
                 default:
+                    throw new \InvalidArgumentException('Adapter configuration is not supported', 1476629708);
             }
 
             if (true !== $this->adapter->connect()) {
