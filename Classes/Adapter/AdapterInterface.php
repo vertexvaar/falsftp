@@ -26,6 +26,8 @@ interface AdapterInterface
     const TYPE_FOLDER = 'folder';
     const AUTHENTICATION_PASSWORD = 1;
     const AUTHENTICATION_PUBKEY = 2;
+    const HASHING_MD5 = 'md5';
+    const HASHING_SHA1 = 'sha1';
 
     /**
      * AdapterInterface constructor.
@@ -41,6 +43,14 @@ interface AdapterInterface
      * @return bool
      */
     public function connect();
+
+    /**
+     * @param string $hashingMethod "sha1" or "md5"
+     * @return mixed
+     */
+    public function getForeignKeyFingerprint($hashingMethod);
+
+    /**
      * @param string $identifier
      * @param bool $files
      * @param bool $folders

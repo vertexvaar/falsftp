@@ -46,6 +46,8 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     const CONFIG_PORT = 'port';
     const CONFIG_USERNAME = 'username';
     const CONFIG_EXPERTS = 'experts';
+    const CONFIG_FOREIGN_KEY_FINGERPRINT = 'foreignKeyFingerprint';
+    const CONFIG_FOREIGN_KEY_FINGERPRINT_METHOD = 'foreignKeyFingerprintMethod';
     const UNSAFE_FILENAME_CHARACTER_EXPRESSION = '\\x00-\\x2C\\/\\x3A-\\x3F\\x5B-\\x60\\x7B-\\xBF';
 
     /**
@@ -98,6 +100,17 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
                 case self::ADAPTER_PHPSECLIB:
                     $this->adapter = new PhpseclibAdapter($this->configuration);
                 default:
+            }
+
+            if (true === $this->configuration[static::CONFIG_EXPERTS]) {
+                if (!empty($this->configuration[static::CONFIG_FOREIGN_KEY_FINGERPRINT])) {
+                    $actualFingerprint = $this->adapter->getForeignKeyFingerprint(
+                        $this->configuration[static::CONFIG_FOREIGN_KEY_FINGERPRINT_METHOD]
+                    );
+                    if ($this->configuration[static::CONFIG_FOREIGN_KEY_FINGERPRINT] !== $actualFingerprint) {
+                        throw new \RuntimeException('The foreign key fingerprint does not match', 1476629167);
+                    }
+                }
             }
         } catch (\Exception $exception) {
             throw new InvalidConfigurationException($exception->getMessage(), $exception->getCode());

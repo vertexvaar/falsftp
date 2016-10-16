@@ -75,22 +75,6 @@ class PhpSshAdapter extends AbstractAdapter
             $this->configuration['port']
         );
 
-        if (true === (bool)$this->configuration[SftpDriver::CONFIG_EXPERTS]) {
-            switch ($this->configuration['foreignKeyFingerprintMethod']) {
-                case 'sha1':
-                    $method = SSH2_FINGERPRINT_SHA1;
-                    break;
-                case 'md5':
-                default:
-                    $method = SSH2_FINGERPRINT_MD5;
-            }
-            $actualFingerprint = strtoupper(ssh2_fingerprint($this->ssh, $method));
-            $expectedFingerprint = strtoupper(str_replace(':', '', $this->configuration['foreignKeyFingerprint']));
-            if ($actualFingerprint !== $expectedFingerprint) {
-                throw new \RuntimeException('The configured foreign key fingerprint does not match', 1476622757);
-            }
-        }
-
         $username = $this->configuration['username'];
 
         switch ($this->configuration[SftpDriver::CONFIG_AUTHENTICATION_METHOD]) {
@@ -119,6 +103,23 @@ class PhpSshAdapter extends AbstractAdapter
             | \FilesystemIterator::SKIP_DOTS
             | \FilesystemIterator::CURRENT_AS_FILEINFO
             | \FilesystemIterator::FOLLOW_SYMLINKS;
+    }
+
+    /**
+     * @param string $hashingMethod "sha1" or "md5"
+     * @return mixed
+     */
+    public function getForeignKeyFingerprint($hashingMethod)
+    {
+        switch ($hashingMethod) {
+            case self::HASHING_SHA1:
+                $hashingMethod = SSH2_FINGERPRINT_SHA1;
+                break;
+            case self::HASHING_MD5:
+            default:
+                $hashingMethod = SSH2_FINGERPRINT_MD5;
+        }
+        return ssh2_fingerprint($this->ssh, $hashingMethod);
     }
 
     /**
