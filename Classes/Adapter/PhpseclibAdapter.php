@@ -154,12 +154,8 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function createFolder($identifier, $recursive = true)
     {
-        \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump(
-            [__METHOD__, func_get_args()],
-            __CLASS__ . '@' . __LINE__,
-            20
-        );
-        die;
+        $this->sftp->mkdir($identifier, $this->configuration[SftpDriver::CONFIG_FOLDER_MODE], $recursive);
+        return $identifier;
     }
 
     /**
