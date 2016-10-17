@@ -84,7 +84,6 @@
                     <adapter>
                         <TCEforms>
                             <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.adapter</label>
-                            <onChange>reload</onChange>
                             <config>
                                 <type>select</type>
                                 <itemsProcFunc>VerteXVaaR\FalSftp\Environment\Detector->getItemsForAdapterSelection</itemsProcFunc>
