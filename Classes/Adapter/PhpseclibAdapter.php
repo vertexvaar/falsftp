@@ -363,7 +363,11 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function __destruct()
     {
-        $this->ssh->disconnect();
-        $this->sftp->disconnect();
+        if ($this->ssh instanceof SSH2) {
+            $this->ssh->disconnect();
+        }
+        if ($this->sftp instanceof SFTP) {
+            $this->sftp->disconnect();
+        }
     }
 }
