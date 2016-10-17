@@ -690,7 +690,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             'name' => PathUtility::basename($folderIdentifier),
             'mtime' => $details['mtime'],
             'ctime' => $details['ctime'],
-            'storage' => $this->storageUid
+            'storage' => $this->storageUid,
         ];
     }
 
