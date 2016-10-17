@@ -71,6 +71,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     protected $rootPathLength = 0;
 
     /**
+     * @var string
+     */
+    protected $scheme = 'https://';
+
+    /**
      * Processes the configuration for this driver.
      *
      * @throws InvalidConfigurationException
@@ -84,6 +89,22 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
                                   | ResourceStorageInterface::CAPABILITY_PUBLIC
                                   | ResourceStorageInterface::CAPABILITY_WRITABLE;
+            $parsedUrl = parse_url($this->configuration[self::CONFIG_PUBLIC_URL]);
+            if (isset($parsedUrl['scheme'], $parsedUrl['host'])) {
+                $publicDomain = $parsedUrl['host'];
+                if (isset($parsedUrl['path'])) {
+                    $publicDomain .= $parsedUrl['path'];
+                }
+            } elseif (isset($parsedUrl['path'])) {
+                $publicDomain = $parsedUrl['path'];
+            } else {
+                throw new InvalidConfigurationException('The given public url is not valid', 1476695176);
+            }
+            $this->configuration[self::CONFIG_PUBLIC_URL] = rtrim($publicDomain, '/') . '/';
+
+            if (true !== (bool)GeneralUtility::getIndpEnv('TYPO3_SSL')) {
+                $this->scheme = 'http://';
+            }
         } else {
             $this->capabilities = ResourceStorageInterface::CAPABILITY_BROWSABLE
                                   | ResourceStorageInterface::CAPABILITY_WRITABLE;
@@ -178,7 +199,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
      */
     public function getPublicUrl($identifier)
     {
-        return $this->configuration[self::CONFIG_PUBLIC_URL] . $identifier;
+        return $this->scheme . $this->configuration[self::CONFIG_PUBLIC_URL] . ltrim($identifier, '/');
     }
 
     /**

@@ -21,7 +21,7 @@
                 <source>Root Level</source>
             </trans-unit>
             <trans-unit id="flexform.general.publicUrl">
-                <source>Public URL</source>
+                <source>Public URL (without scheme)</source>
             </trans-unit>
             <trans-unit id="flexform.general.authenticationMethod">
                 <source>Authentication Method</source>
