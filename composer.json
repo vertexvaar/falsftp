@@ -17,7 +17,7 @@
   ],
   "require": {
     "php": "^5.5.0 || ^7.0.0",
-    "typo3/cms-core": "^7.6.1 || >=8.0.0 <8.4.0"
+    "typo3/cms-core": "^7.6.1 || ^8.0"
   },
   "replace": {
     "in2code/fal_sftp": "self.version",
@@ -25,7 +25,8 @@
     "in2code/falsftp": "self.version",
     "typo3-ter/fal_sftp": "self.version",
     "typo3-ter/fal-sftp": "self.version",
-    "typo3-ter/falsftp": "self.version"
+    "typo3-ter/falsftp": "self.version",
+    "falsftp": "self.version"
   },
   "suggest": {
     "phpseclib/phpseclib": "You need either this package or the ssh2 extension for this driver to work",
