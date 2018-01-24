@@ -23,21 +23,6 @@ Install via composer:
 composer require vertexvaar/falsftp
 ```
 
-AND add following code to your LocalConfiguration.php into the SYS section
-
-```
-'fal' => [
-    'registeredDrivers' => [
-        'Sftp' => [
-            'class' => 'VerteXVaaR\\FalSftp\\Driver\\SftpDriver',
-            'flexFormDS' => 'FILE:EXT:falsftp/Configuration/FlexForm/DriverConfiguration.xml',
-            'label' => 'SFTP Driver',
-            'shortName' => 'Sftp',
-        ],
-    ],
-],
-```
-
 ## Update information
 
 If you update falsftp from 2.x to 3.x you will need to adjust your driver configuration.
