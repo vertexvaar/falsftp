@@ -20,7 +20,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType']['png']
 
 // register sftp driver for file abstraction layer
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['registeredDrivers']['Sftp'] = [
-    'class' => 'VerteXVaaR\\FalSftp\\Driver\\SftpDriver',
+    'class' => \VerteXVaaR\FalSftp\Driver\SftpDriver::class,
     'flexFormDS' => 'FILE:EXT:falsftp/Configuration/FlexForm/DriverConfiguration.xml',
     'label' => 'SFTP Driver',
     'shortName' => 'Sftp',
