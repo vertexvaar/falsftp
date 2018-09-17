@@ -2,7 +2,7 @@
 
 ## What does it do?
 
-This driver enables TYPO3 to connect to another server via SSH and use the remove filesystem as it would be on the local server.
+This driver enables TYPO3 to connect to another server via SSH and use the remote filesystem as it would be on the local server.
 After installation and configuration you will see another file storage in the Filelist module, where you can manage your assets.
 The configured storage is available everywhere, where FAL is being used.
 It can replace the good old fileadmin or used as secondary file storage.
