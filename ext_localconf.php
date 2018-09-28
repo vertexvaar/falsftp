@@ -19,9 +19,11 @@
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType']['png'] = 'image/png';
 
 // register sftp driver for file abstraction layer
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['registeredDrivers']['Sftp'] = [
-    'class' => \VerteXVaaR\FalSftp\Driver\SftpDriver::class,
-    'flexFormDS' => 'FILE:EXT:falsftp/Configuration/FlexForm/DriverConfiguration.xml',
-    'label' => 'SFTP Driver',
-    'shortName' => 'Sftp',
-];
+/** @var \TYPO3\CMS\Core\Resource\Driver\DriverRegistry $driverRegistry */
+$driverRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Resource\Driver\DriverRegistry::class);
+$driverRegistry->registerDriverClass(
+    \VerteXVaaR\FalSftp\Driver\SftpDriver::class,
+    'Sftp',
+    'SFTP Driver',
+    'FILE:EXT:falsftp/Configuration/FlexForm/DriverConfiguration.xml'
+);
