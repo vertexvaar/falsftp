@@ -22,7 +22,7 @@ $EM_CONF[$_EXTKEY] = [
     'category' => 'be',
     'constraints' => [
         'depends' => [
-            'typo3' => '7.6.1-8.7.99',
+            'typo3' => '7.6.1-9.5.99',
         ],
         'conflicts' => [],
         'suggests' => [],
@@ -34,5 +34,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Oliver Eglseder',
     'author_email' => 'php@vxvr.de',
     'author_company' => 'vxvr.de',
-    'version' => '3.1.1',
+    'version' => '3.2.0',
 ];
