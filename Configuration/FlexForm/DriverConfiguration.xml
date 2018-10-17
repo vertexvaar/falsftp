@@ -7,6 +7,15 @@
                     <sheetTitle>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general</sheetTitle>
                 </TCEforms>
                 <el>
+                    <caseSensitive>
+                        <TCEforms>
+                            <label>LLL:EXT:filelist/Resources/Private/Language/locallang_mod_file_list.xlf:localDriverFlexform_caseSensitive</label>
+                            <config>
+                                <type>check</type>
+                                <default>1</default>
+                            </config>
+                        </TCEforms>
+                    </caseSensitive>
                     <hostname>
                         <TCEforms>
                             <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.general.hostname</label>
