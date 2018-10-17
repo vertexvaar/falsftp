@@ -150,6 +150,10 @@ class PhpseclibAdapter extends AbstractAdapter
             return $directoryEntries;
         }
         $items = $this->sftp->nlist($identifier, $recursive);
+        if (false === $items) {
+            // Access not allowed?
+            return [];
+        }
         foreach ($items as $item) {
             if ($item === '.' || $item === '..') {
                 continue;
