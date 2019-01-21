@@ -973,16 +973,12 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         } else {
             // Define character set
             if (!$charset) {
-                if (TYPO3_MODE === 'FE') {
-                    $charset = $GLOBALS['TSFE']->renderCharset;
-                } else {
-                    // default for Backend
-                    $charset = 'utf-8';
-                }
+                $charset = 'utf-8';
             }
             // If a charset was found, convert fileName
             if ($charset) {
-                $fileName = $this->getCharsetConversion()->specCharsToASCII($charset, $fileName);
+                $fileName = GeneralUtility::makeInstance(CharsetConverter::class)
+                                          ->specCharsToASCII($charset, $fileName);
             }
             // Replace unwanted characters by underscores
             $cleanFileName = preg_replace(
@@ -999,27 +995,6 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             );
         }
         return $cleanFileName;
-    }
-
-    /**
-     * Gets the charset conversion object.
-     *
-     * @return CharsetConverter
-     */
-    protected function getCharsetConversion()
-    {
-        if (!isset($this->charsetConversion)) {
-            if (TYPO3_MODE === 'FE') {
-                $this->charsetConversion = $GLOBALS['TSFE']->csConvObj;
-            } elseif (is_object($GLOBALS['LANG'])) {
-                // BE assumed:
-                $this->charsetConversion = $GLOBALS['LANG']->csConvObj;
-            } else {
-                // The object may not exist yet, so we need to create it now. Happens in the Install Tool for example.
-                $this->charsetConversion = GeneralUtility::makeInstance(CharsetConverter::class);
-            }
-        }
-        return $this->charsetConversion;
     }
 
     /**

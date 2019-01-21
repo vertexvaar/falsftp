@@ -96,7 +96,7 @@ class PhpSshAdapter extends AbstractAdapter
             default:
         }
         $this->sftp = ssh2_sftp($this->ssh);
-        $this->sftpWrapper = 'ssh2.sftp://' . $this->sftp;
+        $this->sftpWrapper = 'ssh2.sftp://' . (int)$this->sftp;
         $this->sftpWrapperLength = strlen($this->sftpWrapper);
         $this->iteratorFlags =
             \FilesystemIterator::UNIX_PATHS

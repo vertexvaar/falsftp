@@ -22,7 +22,7 @@ $EM_CONF[$_EXTKEY] = [
     'category' => 'be',
     'constraints' => [
         'depends' => [
-            'typo3' => '7.6.1-8.7.99',
+            'typo3' => '7.6.1-9.5.99',
         ],
         'conflicts' => [],
         'suggests' => [],
