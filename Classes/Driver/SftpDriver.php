@@ -23,6 +23,7 @@ use TYPO3\CMS\Core\Resource\Exception\FileOperationErrorException;
 use TYPO3\CMS\Core\Resource\Exception\InvalidConfigurationException;
 use TYPO3\CMS\Core\Resource\Exception\InvalidFileNameException;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
+use TYPO3\CMS\Core\Type\File\FileInfo;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use VerteXVaaR\FalSftp\Adapter\AdapterInterface;
@@ -693,6 +694,9 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $information['folder_hash'] = $this->hashIdentifier(
             $this->getParentFolderIdentifierOfIdentifier($originalIdentifier)
         );
+        if (empty($information['mimetype'])) {
+            $information['mimetype'] = $this->guessMimeType($originalIdentifier);
+        }
         return $information;
     }
 
@@ -1063,5 +1067,39 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $octalString = $this->configuration[$mode];
         }
         $this->configuration[$mode] = octdec($octalString);
+    }
+
+    /**
+     * @param string $originalIdentifier
+     * @return string
+     */
+    protected function guessMimeType($originalIdentifier)
+    {
+        $mimeType = false;
+        $fileExtensionToMimeTypeMapping = $GLOBALS['TYPO3_CONF_VARS']['SYS']['FileInfo']['fileExtensionToMimeType'];
+        $lowercaseFileExtension = strtolower(pathinfo($originalIdentifier, PATHINFO_EXTENSION));
+        if (!empty($fileExtensionToMimeTypeMapping[$lowercaseFileExtension])) {
+            $mimeType = $fileExtensionToMimeTypeMapping[$lowercaseFileExtension];
+        }
+
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuessers'])) {
+            $mimeTypeGuessers = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][FileInfo::class]['mimeTypeGuessers'];
+            foreach ($mimeTypeGuessers as $mimeTypeGuesser) {
+                $hookParameters = [
+                    'mimeType' => &$mimeType,
+                ];
+
+                GeneralUtility::callUserFunction($mimeTypeGuesser, $hookParameters, $this);
+            }
+        }
+
+        if (false === $mimeType) {
+            $mimeTypeMapping = include(__DIR__ . '/../../Resources/Private/Data/mimetype.php');
+            if (isset($mimeTypeMapping[$lowercaseFileExtension])) {
+                $mimeType = $mimeTypeMapping[$lowercaseFileExtension];
+            }
+        }
+
+        return $mimeType;
     }
 }
