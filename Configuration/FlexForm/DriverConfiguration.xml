@@ -134,12 +134,12 @@
                     <password>
                         <TCEforms>
                             <label>LLL:EXT:falsftp/Resources/Private/Language/locallang.xlf:flexform.password.password</label>
+                            <config>
+                                <type>input</type>
+                                <size>33</size>
+                                <eval>password,required</eval>
+                            </config>
                         </TCEforms>
-                        <config>
-                            <type>input</type>
-                            <size>33</size>
-                            <eval>password,required</eval>
-                        </config>
                     </password>
                 </el>
             </ROOT>
