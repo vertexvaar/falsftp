@@ -1007,27 +1007,6 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
     }
 
     /**
-     * Gets the charset conversion object.
-     *
-     * @return CharsetConverter
-     */
-    protected function getCharsetConversion()
-    {
-        if (!isset($this->charsetConversion)) {
-            if (TYPO3_MODE === 'FE') {
-                $this->charsetConversion = $GLOBALS['TSFE']->csConvObj;
-            } elseif (is_object($GLOBALS['LANG'])) {
-                // BE assumed:
-                $this->charsetConversion = $GLOBALS['LANG']->csConvObj;
-            } else {
-                // The object may not exist yet, so we need to create it now. Happens in the Install Tool for example.
-                $this->charsetConversion = GeneralUtility::makeInstance(CharsetConverter::class);
-            }
-        }
-        return $this->charsetConversion;
-    }
-
-    /**
      * Copied from LocalDriver
      *
      * @param array $items
@@ -1102,5 +1081,15 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         }
 
         return $mimeType;
+    }
+
+    /**
+     * Gets the charset conversion object.
+     *
+     * @return CharsetConverter
+     */
+    protected function getCharsetConversion()
+    {
+        return GeneralUtility::makeInstance(CharsetConverter::class);
     }
 }
