@@ -295,7 +295,7 @@ class PhpseclibAdapter extends AbstractAdapter
      */
     public function downloadFile($identifier, $target)
     {
-        return ($this->sftp->get($identifier, $target) === true) ? $identifier : '';
+        return ($this->sftp->get($identifier, $target) === true) ? $target : '';
     }
 
     /**
