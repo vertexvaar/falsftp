@@ -977,18 +977,16 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             );
         } else {
             // Define character set
-            if (!$charset) {
-                if (TYPO3_MODE === 'FE') {
+            if ('' === $charset) {
+                // default for Backend
+                $charset = 'utf-8';
+                // Check for TYPO3 v7
+                if (TYPO3_MODE === 'FE' && !empty($GLOBALS['TSFE']->renderCharset)) {
                     $charset = $GLOBALS['TSFE']->renderCharset;
-                } else {
-                    // default for Backend
-                    $charset = 'utf-8';
                 }
             }
             // If a charset was found, convert fileName
-            if ($charset) {
-                $fileName = $this->getCharsetConversion()->specCharsToASCII($charset, $fileName);
-            }
+            $fileName = $this->getCharsetConversion()->specCharsToASCII($charset, $fileName);
             // Replace unwanted characters by underscores
             $cleanFileName = preg_replace(
                 '/[' . self::UNSAFE_FILENAME_CHARACTER_EXPRESSION . '\\xC0-\\xFF]/',
