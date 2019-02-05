@@ -659,11 +659,11 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
             $propertiesToExtract = [
                 'size',
                 'atime',
-                'atime',
                 'mtime',
                 'ctime',
                 'mimetype',
                 'name',
+                'extension',
                 'identifier',
                 'identifier_hash',
                 'storage',
@@ -691,6 +691,7 @@ class SftpDriver extends AbstractHierarchicalFilesystemDriver
         $information['identifier'] = $originalIdentifier;
         $information['storage'] = $this->storageUid;
         $information['identifier_hash'] = $this->hashIdentifier($originalIdentifier);
+        $information['extension'] = strtolower(pathinfo($originalIdentifier, PATHINFO_EXTENSION));
         $information['folder_hash'] = $this->hashIdentifier(
             $this->getParentFolderIdentifierOfIdentifier($originalIdentifier)
         );
