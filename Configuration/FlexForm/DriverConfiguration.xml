@@ -9,7 +9,7 @@
                 <el>
                     <caseSensitive>
                         <TCEforms>
-                            <label>LLL:EXT:filelist/Resources/Private/Language/locallang_mod_file_list.xlf:localDriverFlexform_caseSensitive</label>
+                            <label>LLL:EXT:core/Resources/Private/Language/locallang_mod_file.xlf:sys_file_storage.localDriverFlexform_caseSensitive</label>
                             <config>
                                 <type>check</type>
                                 <default>1</default>
